@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import { cwd } from 'node:process';
-import { join as joinPath } from 'node:path';
-import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers'
@@ -38,8 +35,17 @@ async function main() {
         .help()
         .parseSync();
 
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
+    const browser = await chromium.launch({
+        args: [
+            '--disable-lcd-text',
+            '--disable-font-subpixel-positioning'
+        ]
+    });
+
+    const context = await browser.newContext({
+        deviceScaleFactor: 2
+    });
+
     await context.route('http://vsb-eink-renderer/rss', async route => {
         const rss = await parseRSS('https://info.sso.vsb.cz/cz.vsb.edison.info.web/rss?orgUnitId=1');
         return route.fulfill({status: 200, json: rss});
