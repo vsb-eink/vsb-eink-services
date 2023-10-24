@@ -3,6 +3,7 @@
 import { cwd } from 'node:process';
 import { join as joinPath } from 'node:path';
 import { writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers'
 import { chromium } from 'playwright';
@@ -41,7 +42,6 @@ async function main() {
     const context = await browser.newContext();
     await context.route('http://vsb-eink-renderer/rss', async route => {
         const rss = await parseRSS('https://info.sso.vsb.cz/cz.vsb.edison.info.web/rss?orgUnitId=1');
-        writeFileSync(joinPath(cwd(), 'rss.json'), JSON.stringify(rss));
         return route.fulfill({status: 200, json: rss});
     });
     context.on('console', msg => console.log(msg.text()));
@@ -49,7 +49,7 @@ async function main() {
     const page = await context.newPage();
     await page.setViewportSize({width: options.width, height: options.height});
 
-    await page.goto(joinPath(cwd(), options.path), { waitUntil: 'networkidle' });
+    await page.goto(pathToFileURL(options.path).href, { waitUntil: 'networkidle' });
     await page.screenshot({path: options.output});
 
     await browser.close();
