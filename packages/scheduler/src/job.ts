@@ -1,5 +1,3 @@
-import { Cron } from 'croner';
-
 export enum EInkJobAction {
 	DISPLAY_FULL = 'full',
 	DISPLAY_PARTIAL = 'partial',
@@ -9,8 +7,10 @@ export interface EInkJob {
 	when: string;
 	target: string;
 	action: EInkJobAction;
-	env?: Record<string, string>;
-	nativeHandle?: Cron;
+	context: {
+		disabled: boolean;
+		iteration: number;
+	};
 	args: string[];
 }
 

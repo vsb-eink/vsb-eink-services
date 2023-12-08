@@ -1,3 +1,4 @@
 WORKDIR=/home/marek/Projekty/vsb-eink-scheduler/examples
-* * * * * all partial images/weather.html
-5 * * * * all full images/lena.png
+5-10 * * * * all full images/welcome.html
+10-20 * * * * all partial images/weather.html
+* * * * * all full images/lena.png images/baboon.jpg

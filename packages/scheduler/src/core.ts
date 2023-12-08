@@ -1,141 +1,181 @@
 import { extname } from 'node:path';
-import { readFile } from 'fs/promises';
+import { readFile } from 'node:fs/promises';
 import { constants } from 'node:fs/promises';
 
-import { MqttClient } from 'mqtt';
-import { Cron } from 'croner';
+import { parseCronExpression } from 'cron-schedule';
+import { set } from 'date-fns';
 
 import {
 	EInkJob,
 	isEInkJobDisplayFull,
 	isEInkJobDisplayPartial,
 } from './job.js';
-import { canAccess } from './utils.js';
+import { canAccess, sleep } from './utils.js';
 import { logger } from './logger.js';
-
-export interface EInkScheduleOptions {
-	paused?: boolean;
-}
+import { loadCrontab, saveCrontab } from './crontab.js';
+import { AbstractMessageBroker } from './message-broker.js';
 
 class EInkSchedulerCore {
+	private env: Record<string, string> = {};
 	private jobs: EInkJob[] = [];
+	private crontabPath?: string;
+	private running = false;
+	private broker: AbstractMessageBroker;
 
-	constructor(private mqtt: MqttClient) {}
+	constructor({
+		crontabPath,
+		broker,
+	}: {
+		crontabPath?: string;
+		broker: AbstractMessageBroker;
+	}) {
+		this.crontabPath = crontabPath;
+		this.broker = broker;
+	}
 
-	async add(job: EInkJob, opts?: EInkScheduleOptions) {
-		const index = this.findJobIndex(job);
-		if (index !== -1) {
-			logger.warn(
-				`Job already exists: ${job.when} ${job.target} ${
-					job.action
-				} ${job.args.join(' ')}`,
-			);
-			return;
+	async getJobs() {
+		return this.jobs;
+	}
+
+	async getJobById(id: string) {
+		return this.jobs.find((job) => job.id === id);
+	}
+
+	async setJobs(jobs: EInkJob[], env?: Record<string, string>) {
+		this.jobs = jobs;
+		if (env) {
+			this.env = env;
 		}
 
-		const topic = this.getTopic(job);
+		await this.commitToCrontab();
+	}
 
-		const cron = new Cron(job.when, { paused: opts?.paused }, async () => {
-			logger.info(`Publishing to ${topic}...`);
+	async loop() {
+		this.running = true;
 
-			if (await canAccess(job.args[0], constants.R_OK)) {
-				const buffer = await readFile(job.args[0]);
-				await this.mqtt.publishAsync(topic, buffer);
-			} else {
-				await this.mqtt.publishAsync(topic, job.args[0]);
+		while (this.running) {
+			for (const job of this.jobs) {
+				// skip jobs that are not supposed to run right now
+				if (job.action !== 'full' && job.action !== 'partial') {
+					logger.warn(
+						`Unsupported action: ${job.action}, skipping`,
+					);
+					continue;
+				}
+
+				// disabled jobs are skipped
+				if (job.context.disabled) {
+					continue;
+				}
+
+				// skip jobs that are not supposed to run right now
+				const cron = parseCronExpression(job.when);
+				const roundedDate = set(new Date(), { seconds: 0 });
+				if (!cron.matchDate(roundedDate)) {
+					continue;
+				}
+
+				logger.info(
+					`Executing job ${job.id} ${job.when} ${job.target} ${job.action} ${job.args}`,
+				);
+
+				const argIndex = job.context.iteration % job.args.length;
+				const topic = this.calculateTopic(job);
+
+				try {
+					let buffer;
+
+					const isURL = ['http://', 'https://'].some((protocol) =>
+						job.args[argIndex].startsWith(protocol),
+					);
+					const isFile = await canAccess(
+						job.args[argIndex],
+						constants.R_OK,
+					);
+
+					if (!isURL && !isFile) {
+						logger.error(`Failed to read: ${job.args[argIndex]}`);
+						break;
+					}
+
+					// read remote file contents
+					if (isURL) {
+						const response = await fetch(job.args[argIndex]);
+						if (!response.ok) {
+							logger.error(
+								`Failed to fetch ${job.args[argIndex]} due to status ${response.status}`,
+							);
+							break;
+						}
+						buffer = await response.arrayBuffer();
+					}
+
+					// read local file contents
+					if (isFile) {
+						buffer = await readFile(job.args[argIndex]);
+					}
+
+					// publish the message
+					this.broker
+						.publish(topic, Buffer.from(buffer!))
+						.catch((err) => logger.error(err));
+				} catch (err) {
+					logger.error(err);
+				} finally {
+					// increment the iteration counter
+					job.context.iteration++;
+				}
+
+				// always go from the first job top down, thus allowing only one job to run at a time
+				break;
 			}
-		});
 
-		job.nativeHandle = cron;
-		this.jobs.push(job);
-	}
-	async addMultiple(jobs: EInkJob[], opts?: EInkScheduleOptions) {
-		for (const job of jobs) {
-			await this.add(job, opts);
+			// stop the loop if the scheduler is stopped
+			if (!this.running) {
+				break;
+			}
+
+			// sleep for 1 minute
+			await sleep({ minutes: 1 });
 		}
 	}
 
-	async remove(job: EInkJob, opts?: EInkScheduleOptions) {
-		const index = this.findJobIndex(job);
-		if (index < 0) {
-			logger.warn(
-				`Job not found: ${job.when} ${job.target} ${
-					job.action
-				} ${job.args.join(' ')}`,
-			);
-			return;
-		}
-
-		const cron = this.jobs[index].nativeHandle;
-		cron?.stop();
-		this.jobs.splice(index, 1);
-	}
-	async removeMultiple(jobs: EInkJob[], opts?: EInkScheduleOptions) {
-		for (const job of jobs) {
-			await this.remove(job, opts);
-		}
+	async stop() {
+		this.running = false;
 	}
 
-	async disable(job: EInkJob, opts?: EInkScheduleOptions) {
-		const index = this.findJobIndex(job);
-		if (index < 0) {
-			logger.warn(
-				`Job not found: ${job.when} ${job.target} ${
-					job.action
-				} ${job.args.join(' ')}`,
-			);
-			return;
+	async loadFromCrontab(path?: string) {
+		if (!path && !this.crontabPath) {
+			throw new Error('No crontab path provided');
 		}
 
-		const cron = this.jobs[index].nativeHandle;
-		cron?.stop();
+		const crontabPath = path ?? this.crontabPath;
+		this.jobs = await loadCrontab(crontabPath!);
 	}
-	async disableMultiple(jobs: EInkJob[], opts?: EInkScheduleOptions) {
-		for (const job of jobs) {
-			await this.disable(job, opts);
+	async commitToCrontab(path?: string) {
+		if (!path && !this.crontabPath) {
+			throw new Error('No crontab path provided');
 		}
+
+		const crontabPath = path ?? this.crontabPath;
+		return saveCrontab(crontabPath!, this.env, this.jobs);
 	}
 
-	async start() {
-		for (const job of this.jobs) {
-			job.nativeHandle?.resume();
-		}
-	}
-	async close() {
-		for (const job of this.jobs) {
-			job.nativeHandle?.stop();
-		}
-		return this.mqtt.endAsync();
-	}
-
-	private findJobIndex(job: EInkJob): number {
-		for (let i = 0; i < this.jobs.length; i++) {
-			const j = this.jobs[i];
-
-			if (j.when != job.when) continue;
-			if (j.target != job.target) continue;
-			if (j.action != job.action) continue;
-			if (JSON.stringify(j.args) != JSON.stringify(job.args)) continue;
-
-			return i;
-		}
-		return -1;
-	}
-
-	private getTopic(job: EInkJob) {
+	private calculateTopic(job: EInkJob) {
 		if (!isEInkJobDisplayFull(job) && !isEInkJobDisplayPartial(job)) {
 			throw new Error(`Unsupported action: ${job.action}`);
 		}
 
-		const mode = job.action === 'full' ? '4bpp' : '1bpp';
-		const type = extname(job.args[0]).slice(1);
+		const argIndex = job.context.iteration % job.args.length;
 
-		let format = extname(job.args[0]).slice(1);
+		const mode = job.action === 'full' ? '4bpp' : '1bpp';
+
+		let format = extname(job.args[argIndex]).slice(1);
 		if (format === 'bin') {
 			format = 'raw';
 		}
 
-		return `vsb-eink/${job.target}/display/${format}_${mode}`;
+		return `vsb-eink/${job.target}/display/${format}_${mode}/set`;
 	}
 }
 

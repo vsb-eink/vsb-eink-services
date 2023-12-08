@@ -1,50 +1,59 @@
+#!/usr/bin/env node
+
 import { existsSync } from 'node:fs';
 
-import yargs from 'yargs/yargs';
-import { hideBin } from 'yargs/helpers';
 import { connectAsync } from 'mqtt';
+import { matches as topicMatches } from 'mqtt-pattern';
+import Fastify from 'fastify';
 
 import { EInkSchedulerCore } from './core.js';
-import { loadCrontab } from './crontab.js';
 import { logger } from './logger.js';
+import { API_HOST, API_PORT, BROKER_HOST, CRONTAB_PATH } from './env.js';
 
-async function main() {
-	const argv = yargs(hideBin(process.argv))
-		.env('VSB_EINK_SCHEDULER')
-		.option('broker-host', {
-			describe: 'MQTT broker host',
-			type: 'string',
-			default: 'localhost',
-		})
-		.option('crontab', {
-			describe: 'Crontab file path',
-			type: 'string',
-			default: 'eink.cron',
-		})
-		.help()
-		.parseSync();
+logger.info(`Connecting to MQTT broker at ${BROKER_HOST}`);
+const mqtt = await connectAsync(
+	!BROKER_HOST.startsWith('mqtt://') ? `mqtt://${BROKER_HOST}` : BROKER_HOST,
+);
 
-	logger.info(`Connecting to MQTT broker at ${argv.brokerHost}...`);
-	const mqtt = await connectAsync(
-		argv.brokerHost.startsWith('mqtt://')
-			? argv.brokerHost
-			: `mqtt://${argv.brokerHost}`,
-	);
+const core = new EInkSchedulerCore({
+	crontabPath: CRONTAB_PATH,
+	broker: {
+		publish: async (topic, message) => {
+			logger.info(`Publishing to ${topic}`);
+			await mqtt.publishAsync(topic, message);
+		},
+		subscribe: async (topic) => {
+			logger.info(`Subscribing to ${topic}`);
+			await mqtt.subscribeAsync(topic);
+		},
+		setHandler: async (topic, handler) => {
+			logger.info(`Setting MQTT handler`);
+			mqtt.on('message', (t, m) => {
+				logger.info(`Received message on ${t}`);
+				if (topicMatches(topic, t)) {
+					handler(t, m);
+				}
+			});
+		},
+	},
+});
 
-	const core = new EInkSchedulerCore(mqtt);
-
-	logger.info(`Loading crontab file at ${argv.crontab}...`);
-	if (existsSync(argv.crontab)) {
-		const jobs = await loadCrontab(argv.crontab);
-
-		logger.info(`Adding ${jobs.length} jobs...`);
-		await core.addMultiple(jobs, { paused: false });
-	} else {
-		logger.warn(`Crontab file not found at ${argv.crontab}`);
-	}
-
-	logger.info(`Starting...`);
-	await core.start();
-	logger.info(`Started`);
+logger.info(`Loading crontab file at ${CRONTAB_PATH}`);
+if (existsSync(CRONTAB_PATH)) {
+	await core.loadFromCrontab();
+} else {
+	logger.warn(`Crontab file not found at ${CRONTAB_PATH}`);
 }
-main().catch((err) => console.error(err));
+
+logger.info(`Setting http api handler`);
+const httpServer = Fastify();
+await httpServer.listen({
+	port: API_PORT,
+	host: API_HOST,
+	listenTextResolver: (address) => {
+		return `Listening on ${address}`;
+	},
+});
+
+logger.info(`Starting scheduling loop`);
+await core.loop();
