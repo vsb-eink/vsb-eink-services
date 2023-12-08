@@ -128,3 +128,6 @@ dist
 
 # IDE
 .idea/
+
+# Internal public workdir
+internal-public/workdir/*

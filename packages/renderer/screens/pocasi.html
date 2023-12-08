@@ -39,7 +39,7 @@
         document.getElementById('date-text').innerText = new Date().toLocaleString('cs-CZ');
 
         // RSS
-        const rss = await fetch('http://vsb-eink-renderer/rss').then(r => r.json());
+        const rss = await fetch(`/rss?url=${encodeURIComponent('https://info.sso.vsb.cz/cz.vsb.edison.info.web/rss?orgUnitId=1')}`).then(r => r.json());
         const rssWidget = document.getElementById('rss-widget');
         for (const item of rss.items.slice(0, 3)) {
             const pubDate = new Date(item.published).toLocaleDateString();

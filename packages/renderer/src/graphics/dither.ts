@@ -1,6 +1,6 @@
-import { QuantiseFunc } from './quantise';
-import { getPixel, ImageData, addToPixel, setPixel } from './image';
-import { clamp } from '../utils/math';
+import { QuantiseFunc } from './quantise.js';
+import { getPixel, ImageData, addToPixel, setPixel } from './image.js';
+import { clamp } from '../utils/math.js';
 
 export type DitherFunction = (
 	source: Readonly<ImageData>,

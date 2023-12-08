@@ -1,4 +1,4 @@
-import { ImageData } from './image';
+import { ImageData } from './image.js';
 
 export function changeDepth(image: Readonly<ImageData>, depth: number) {
 	for (let i = 0; i < image.data.length; ++i) {

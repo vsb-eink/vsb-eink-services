@@ -1,4 +1,4 @@
-import { clamp } from '../utils/math';
+import { clamp } from '../utils/math.js';
 
 export interface ImageData {
 	readonly data: Uint8ClampedArray;
