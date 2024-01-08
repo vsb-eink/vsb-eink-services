@@ -1,3 +1,4 @@
-WORKDIR=/home/marek/Projekty/vsb-eink-scheduler/examples
+* * * * * all full https://upload.wikimedia.org/wikipedia/en/7/7d/Lenna_%28test_image%29.png
 * * * * * all partial screens/pocasi.html
-5 * * * * all full images/lena.png
+* * * * * all full images/lena.png
+* * * * * all partial https://www.fei.vsb.cz/cs/index.html

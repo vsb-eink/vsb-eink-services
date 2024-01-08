@@ -1,45 +1,53 @@
-import { createInterface as createReadlineInterface } from 'node:readline';
-import { createReadStream } from 'node:fs';
-import { writeFile } from 'fs/promises';
+import { PathLike } from 'node:fs';
+import { writeFile, readFile } from 'node:fs/promises';
 
-import { parse as parseEnv } from 'dotenv';
 import cronValidate from 'cron-validate';
 import { parse as parseCSV, stringify as stringifyCSV } from 'csv/sync';
 import { Mutex } from 'async-mutex';
-import { Adapter } from 'lowdb';
-import { TextFile } from 'lowdb/node';
 
-import { EInkJob, EInkJobAction } from './job.js';
-import { isEmpty } from './utils.js';
-import { logger } from './logger.js';
-import { randomUUID } from 'crypto';
+export enum EInkJobAction {
+	DISPLAY_FULL = 'full',
+	DISPLAY_PARTIAL = 'partial',
+}
 
+export interface EInkJob {
+	when: string;
+	target: string;
+	action: EInkJobAction;
+	args: string[];
+}
 
-export class CrontabFile implements Adapter<>
+export interface EInkJobDisplayFull extends EInkJob {
+	action: EInkJobAction.DISPLAY_FULL;
+}
 
-export function parseCrontabLine(line: string): EInkJob {
-	const parseResult = parseCSV(line, {
-		columns: false,
-		comment: '#',
-		delimiter: ' ',
-		trim: true,
-		skip_empty_lines: true,
-		skip_records_with_empty_values: true,
-	});
+export function isEInkJobDisplayFull(job: EInkJob): job is EInkJobDisplayFull {
+	return job.action === EInkJobAction.DISPLAY_FULL;
+}
 
-	if (parseResult.length !== 1) {
-		throw new Error(`Invalid crontab line, only one field read: ${line}`);
-	}
+export interface EInkJobDisplayPartial extends EInkJob {
+	action: EInkJobAction.DISPLAY_PARTIAL;
+}
 
-	const fields: string[] = parseResult[0];
+export function isEInkJobDisplayPartial(
+	job: EInkJob,
+): job is EInkJobDisplayPartial {
+	return job.action === EInkJobAction.DISPLAY_PARTIAL;
+}
+
+export function parseJob(fields: string[]): EInkJob {
 	if (fields.length < 7) {
-		throw new Error(`Invalid crontab line, not enough fields: ${line}`);
+		throw new Error(
+			`Invalid crontab line, not enough fields: ${JSON.stringify(
+				fields,
+			)}`,
+		);
 	}
 
 	const when = fields.slice(0, 5).join(' ');
 	const target = fields[5];
 	const action = fields[6];
-	const args = fields.slice(7).filter((f) => f !== '');
+	const arguments_ = fields.slice(7).filter((f) => f !== '');
 
 	// only full and partial actions are supported right now
 	if (!['full', 'partial'].includes(action)) {
@@ -56,59 +64,46 @@ export function parseCrontabLine(line: string): EInkJob {
 		when,
 		target,
 		action: action as EInkJobAction,
-		context: {
-			disabled: false,
-			iteration: 0,
-		},
-		args,
+		args: arguments_,
 	};
 
 	return job;
 }
 
-export async function loadCrontab(path: string): Promise<EInkJob[]> {
-	const rl = createReadlineInterface({
-		input: createReadStream(path),
-	});
+const crontabMutex = new Mutex();
 
-	const jobs: EInkJob[] = [];
-	let env = {};
-	for await (const line of rl) {
-		const isComment = line.startsWith('#');
-		if (isComment) continue;
-
-		const isEnv = !isEmpty(parseEnv(line));
-		if (isEnv) {
-			env = { ...env, ...parseEnv(line) };
-		}
-
-		const isJob = !isComment && !isEnv;
-		if (!isJob) continue;
-
-		try {
-			const job = parseCrontabLine(line);
-			jobs.push(job);
-		} catch (err) {
-			logger.error(err);
-		}
-	}
-
-	return jobs;
+export async function readCrontabFile(path: PathLike): Promise<string> {
+	return crontabMutex.runExclusive(async () => readFile(path, 'utf8'));
 }
 
-const crontabMutex = new Mutex();
-export async function saveCrontab(
-	path: string,
-	env: Record<string, string>,
-	jobs: EInkJob[],
-) {
+export async function writeCrontabFile(path: PathLike, content: string) {
+	return crontabMutex.runExclusive(async () => writeFile(path, content));
+}
+
+export async function loadJobsFromCrontab(path: string): Promise<EInkJob[]> {
+	return crontabMutex.runExclusive(async () => {
+		const parseResult = parseCSV(await readFile(path, 'utf8'), {
+			columns: false,
+			comment: '#',
+			delimiter: ' ',
+			trim: true,
+			skip_empty_lines: true,
+			skip_records_with_empty_values: true,
+		});
+
+		const jobs: EInkJob[] = [];
+		for (const fields of parseResult) {
+			const job = parseJob(fields);
+			jobs.push(job);
+		}
+
+		return jobs;
+	});
+}
+
+export async function writeJobsToCrontab(path: string, jobs: EInkJob[]) {
 	return crontabMutex.runExclusive(async () => {
 		let content = '';
-
-		// env
-		for (const envVar in env) {
-			content += `${envVar}=${JSON.stringify(env[envVar])}\n`;
-		}
 
 		// jobs
 		for (const job of jobs) {

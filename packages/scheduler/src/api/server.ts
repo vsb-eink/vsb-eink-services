@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
-import { groupsRouter } from './routes.js';
+import { crontabRouter } from './routes.js';
 
-export const apiRouter: FastifyPluginAsync = async (app, opts) => {
-	app.register(groupsRouter, { prefix: '/groups' });
+export const apiRouter: FastifyPluginAsync = async (app) => {
+	app.register(crontabRouter, { prefix: '/crontab' });
 };

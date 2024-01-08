@@ -1,72 +1,58 @@
 import { extname } from 'node:path';
-import { readFile } from 'node:fs/promises';
-import { constants } from 'node:fs/promises';
+import { readFile, constants } from 'node:fs/promises';
+import { join as joinPath } from 'node:path';
 
 import { parseCronExpression } from 'cron-schedule';
 import { set } from 'date-fns';
 
 import {
+	canAccess,
+	getLastModifiedDate,
+	isHttpUrl,
+	joinUrl,
+	sleep,
+} from './utils.js';
+import { logger } from './logger.js';
+import {
 	EInkJob,
 	isEInkJobDisplayFull,
 	isEInkJobDisplayPartial,
-} from './job.js';
-import { canAccess, sleep } from './utils.js';
-import { logger } from './logger.js';
-import { loadCrontab, saveCrontab } from './crontab.js';
+	loadJobsFromCrontab,
+} from './crontab.js';
 import { AbstractMessageBroker } from './message-broker.js';
+import { CONTENT_PATH, CRONTAB_PATH } from './environment.js';
 
 class EInkSchedulerCore {
-	private env: Record<string, string> = {};
 	private jobs: EInkJob[] = [];
-	private crontabPath?: string;
 	private running = false;
 	private broker: AbstractMessageBroker;
 
-	constructor({
-		crontabPath,
-		broker,
-	}: {
-		crontabPath?: string;
-		broker: AbstractMessageBroker;
-	}) {
-		this.crontabPath = crontabPath;
+	constructor({ broker }: { broker: AbstractMessageBroker }) {
 		this.broker = broker;
-	}
-
-	async getJobs() {
-		return this.jobs;
-	}
-
-	async getJobById(id: string) {
-		return this.jobs.find((job) => job.id === id);
-	}
-
-	async setJobs(jobs: EInkJob[], env?: Record<string, string>) {
-		this.jobs = jobs;
-		if (env) {
-			this.env = env;
-		}
-
-		await this.commitToCrontab();
 	}
 
 	async loop() {
 		this.running = true;
 
-		while (this.running) {
-			for (const job of this.jobs) {
-				// skip jobs that are not supposed to run right now
-				if (job.action !== 'full' && job.action !== 'partial') {
-					logger.warn(
-						`Unsupported action: ${job.action}, skipping`,
-					);
-					continue;
-				}
+		let lastCrontabModificationTime = new Date(0);
 
-				// disabled jobs are skipped
-				if (job.context.disabled) {
-					continue;
-				}
+		const jobIterations = new Map<number, number>();
+		while (this.running) {
+			// check if the crontab file has been modified
+			const crontabModificationTime =
+				await getLastModifiedDate(CRONTAB_PATH);
+
+			// reload the crontab file if it has been modified
+			if (lastCrontabModificationTime < crontabModificationTime) {
+				logger.info(`Crontab file changed, reloading`);
+				lastCrontabModificationTime = crontabModificationTime;
+				await this.loadFromCrontab(CRONTAB_PATH);
+				jobIterations.clear();
+			}
+
+			// loop through all jobs and execute the ones that are supposed to run right now
+			for (let jobIndex = 0; jobIndex < this.jobs.length; jobIndex++) {
+				const job = this.jobs[jobIndex];
 
 				// skip jobs that are not supposed to run right now
 				const cron = parseCronExpression(job.when);
@@ -76,54 +62,34 @@ class EInkSchedulerCore {
 				}
 
 				logger.info(
-					`Executing job ${job.id} ${job.when} ${job.target} ${job.action} ${job.args}`,
+					`Executing job ${job.when} ${job.target} ${job.action} ${job.args}`,
 				);
 
-				const argIndex = job.context.iteration % job.args.length;
-				const topic = this.calculateTopic(job);
-
+				const argumentIndex = jobIterations.get(jobIndex) ?? 0;
 				try {
-					let buffer;
-
-					const isURL = ['http://', 'https://'].some((protocol) =>
-						job.args[argIndex].startsWith(protocol),
+					const { format, mode } = await this.analyseJob(
+						job,
+						argumentIndex,
 					);
-					const isFile = await canAccess(
-						job.args[argIndex],
-						constants.R_OK,
-					);
+					const topic = this.getTopic(job.target, format, mode);
 
-					if (!isURL && !isFile) {
-						logger.error(`Failed to read: ${job.args[argIndex]}`);
-						break;
-					}
-
-					// read remote file contents
-					if (isURL) {
-						const response = await fetch(job.args[argIndex]);
-						if (!response.ok) {
-							logger.error(
-								`Failed to fetch ${job.args[argIndex]} due to status ${response.status}`,
-							);
-							break;
-						}
-						buffer = await response.arrayBuffer();
-					}
-
-					// read local file contents
-					if (isFile) {
-						buffer = await readFile(job.args[argIndex]);
-					}
+					const buffer =
+						format === 'url'
+							? job.args[argumentIndex] // plain url as string
+							: await readFile(job.args[argumentIndex]); // local file as buffer
 
 					// publish the message
 					this.broker
 						.publish(topic, Buffer.from(buffer!))
-						.catch((err) => logger.error(err));
-				} catch (err) {
-					logger.error(err);
+						.catch((error) => logger.error(error));
+				} catch (error) {
+					logger.error(error);
 				} finally {
 					// increment the iteration counter
-					job.context.iteration++;
+					jobIterations.set(
+						jobIndex,
+						(argumentIndex + 1) % job.args.length,
+					);
 				}
 
 				// always go from the first job top down, thus allowing only one job to run at a time
@@ -145,37 +111,49 @@ class EInkSchedulerCore {
 	}
 
 	async loadFromCrontab(path?: string) {
-		if (!path && !this.crontabPath) {
-			throw new Error('No crontab path provided');
-		}
-
-		const crontabPath = path ?? this.crontabPath;
-		this.jobs = await loadCrontab(crontabPath!);
-	}
-	async commitToCrontab(path?: string) {
-		if (!path && !this.crontabPath) {
-			throw new Error('No crontab path provided');
-		}
-
-		const crontabPath = path ?? this.crontabPath;
-		return saveCrontab(crontabPath!, this.env, this.jobs);
+		const crontabPath = path ?? CRONTAB_PATH;
+		this.jobs = await loadJobsFromCrontab(crontabPath!);
 	}
 
-	private calculateTopic(job: EInkJob) {
+	private async analyseJob(job: EInkJob, argumentIndex: number = 0) {
 		if (!isEInkJobDisplayFull(job) && !isEInkJobDisplayPartial(job)) {
 			throw new Error(`Unsupported action: ${job.action}`);
 		}
 
-		const argIndex = job.context.iteration % job.args.length;
-
 		const mode = job.action === 'full' ? '4bpp' : '1bpp';
 
-		let format = extname(job.args[argIndex]).slice(1);
-		if (format === 'bin') {
-			format = 'raw';
+		const path = isHttpUrl(job.args[argumentIndex])
+			? job.args[argumentIndex]
+			: isHttpUrl(CONTENT_PATH)
+			  ? joinUrl(CONTENT_PATH, job.args[argumentIndex])
+			  : joinPath(CONTENT_PATH, job.args[argumentIndex]);
+
+		const isURL = isHttpUrl(path);
+
+		const isLocal = await canAccess(
+			job.args[argumentIndex],
+			constants.R_OK,
+		);
+
+		const extension = extname(job.args[argumentIndex]).slice(1);
+		const isBinary = isLocal && extension === 'bin';
+
+		let format;
+		if (isURL) {
+			format = 'url';
+		} else if (isBinary) {
+			format = 'bin';
+		} else if (isLocal) {
+			format = extension;
+		} else {
+			throw new Error(`File not accessible: ${job.args[argumentIndex]}`);
 		}
 
-		return `vsb-eink/${job.target}/display/${format}_${mode}/set`;
+		return { ...job, format, mode };
+	}
+
+	private getTopic(target: string, format: string, mode: string): string {
+		return `vsb-eink/${target}/display/${format}_${mode}/set`;
 	}
 }
 
