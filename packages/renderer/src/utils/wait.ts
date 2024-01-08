@@ -7,16 +7,16 @@ interface WaitForOptions {
 	timeout?: number;
 }
 export async function waitFor(
-	stateFunc: (() => boolean) | (() => Promise<boolean>),
+	stateFunction: (() => boolean) | (() => Promise<boolean>),
 	options?: WaitForOptions
 ): Promise<void> {
-	const opts: Required<WaitForOptions> = {
+	const options_: Required<WaitForOptions> = {
 		delay: options?.delay ?? 50,
 		timeout: options?.timeout ?? 0,
 	};
 
 	while (true) {
-		if (await stateFunc()) return;
-		await delay(opts.delay);
+		if (await stateFunction()) return;
+		await delay(options_.delay);
 	}
 }

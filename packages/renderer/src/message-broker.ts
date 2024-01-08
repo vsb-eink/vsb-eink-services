@@ -16,8 +16,8 @@ export class MQTTJSMessageBrokerWrapper implements AbstractMessageBroker {
 			for (const [pattern, handler] of this.handlers.entries()) {
 				if (topicMatches(pattern, topic)) {
 					logger.info(`Received message on ${topic}`);
-					handler(topic, message).catch((err) => {
-						logger.error(`Failed to handle message: ${err}`);
+					handler(topic, message).catch((error) => {
+						logger.error(`Failed to handle message: ${error}`);
 					});
 				}
 			}

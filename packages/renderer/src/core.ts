@@ -1,4 +1,4 @@
-import { rm } from 'node:fs/promises';
+import { rm , mkdir, writeFile } from 'node:fs/promises';
 import { join as joinPath } from 'node:path';
 
 import { Browser, BrowserContext } from 'playwright';
@@ -6,49 +6,39 @@ import { Browser, BrowserContext } from 'playwright';
 import { AbstractMessageBroker } from './message-broker.js';
 import { InternalHTTPServer } from './internal-http/index.js';
 import { logger } from './logger.js';
-import { randomUUID } from 'crypto';
-import { mkdir, writeFile } from 'fs/promises';
+import { randomUUID } from 'node:crypto';
+
 
 class EInkRendererCore {
 	private broker: AbstractMessageBroker;
 	private browser: Browser;
-	private internalHTTPServer;
-	private internalHTTPServerAddress: string | null = null;
 
 	constructor({
 		broker,
-		browser,
-		internalHTTPServer,
+		browser
 	}: {
 		broker: AbstractMessageBroker;
 		browser: Browser;
-		internalHTTPServer: InternalHTTPServer;
 	}) {
 		this.broker = broker;
 		this.browser = browser;
-		this.internalHTTPServer = internalHTTPServer;
 	}
 
 	async run() {
-		try {
-			this.internalHTTPServerAddress = await this.internalHTTPServer.server.listen({
-				port: this.internalHTTPServer.options.port,
-				host: this.internalHTTPServer.options.host,
-			});
-			logger.info(`Internal HTTP server listening at ${this.internalHTTPServerAddress}`);
-		} catch (err) {
-			logger.error(`Internal HTTP server failed to start: ${err}`);
-			return;
-		}
-
 		try {
 			await this.broker.subscribe(`vsb-eink/+/display/html_1bpp/set`);
 			await this.broker.setHandler(`vsb-eink/+/display/html_1bpp/set`, this.handleDisplayHtml.bind(this));
 
 			await this.broker.subscribe(`vsb-eink/+/display/html_4bpp/set`);
 			await this.broker.setHandler(`vsb-eink/+/display/html_4bpp/set`, this.handleDisplayHtml.bind(this));
-		} catch (err) {
-			logger.error(`Failed to subscribe to MQTT topics: ${err}`);
+
+			await this.broker.subscribe(`vsb-eink/+/display/url_1bpp/set`);
+			await this.broker.setHandler(`vsb-eink/+/display/url_1bpp/set`, this.handleDisplayHtml.bind(this));
+
+			await this.broker.subscribe(`vsb-eink/+/display/url_4bpp/set`);
+			await this.broker.setHandler(`vsb-eink/+/display/url_4bpp/set`, this.handleDisplayHtml.bind(this));
+		} catch (error) {
+			logger.error(`Failed to subscribe to MQTT topics: ${error}`);
 			return;
 		}
 
@@ -73,8 +63,8 @@ class EInkRendererCore {
 			logger.info(`Saved HTML to ${joinPath(htmlDir, 'index.html')}`);
 
 			context = await this.browser.newContext({});
-			context.on('console', (msg) =>
-				logger.info(`Browser console: ${msg.text()}`),
+			context.on('console', (message_) =>
+				logger.info(`Browser console: ${message_.text()}`),
 			);
 
 			const page = await context.newPage();
@@ -91,8 +81,8 @@ class EInkRendererCore {
 				`vsb-eink/${target}/display/png_${mode}/set`,
 				screenshot,
 			);
-		} catch (err) {
-			logger.error(`Failed to render HTML: ${err}`);
+		} catch (error) {
+			logger.error(`Failed to render HTML: ${error}`);
 		} finally {
 			await context?.close();
 			await rm(htmlDir, { recursive: true, force: true });

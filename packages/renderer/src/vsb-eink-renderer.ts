@@ -14,7 +14,7 @@ import { connectAsync } from 'mqtt';
 import { EInkRendererCore } from './core.js';
 import { MQTTJSMessageBrokerWrapper } from './message-broker.js';
 
-async function cleanup({ browser }: { browser?: Browser | null }) {
+async function cleanup({ browser }: { browser?: Browser }) {
 	if (browser) {
 		logger.info(`Closing browser contexts`);
 		await Promise.all(
@@ -26,27 +26,7 @@ async function cleanup({ browser }: { browser?: Browser | null }) {
 }
 
 async function main() {
-	const argv = yargs(hideBin(process.argv))
-		.env('VSB_EINK_RENDERER')
-		.option('broker-host', {
-			describe: 'MQTT broker host',
-			type: 'string',
-			default: 'localhost',
-		})
-		.option('internal-http-host', {
-			describe: 'Internal HTTP server host',
-			type: 'string',
-			default: 'localhost',
-		})
-		.option('internal-http-port', {
-			describe: 'Internal HTTP server port',
-			type: 'number',
-			default: 0,
-		})
-		.help()
-		.parseSync();
-
-	let browser: Browser | null = null;
+	let browser: Browser | undefined;
 	try {
 		logger.info(`Connecting to MQTT broker at ${argv.brokerHost}`);
 		const mqtt = await connectAsync(
@@ -73,27 +53,17 @@ async function main() {
 		process.once('SIGINT', signalHandler);
 		process.once('SIGTERM', signalHandler);
 
-		logger.info(`Creating internal HTTP server`);
-		const internalHTTPServer = await createInternalHTTPServer({
-			root: joinPath(process.cwd(), 'internal-public'),
-			port: argv.internalHttpPort,
-			host: argv.internalHttpHost,
-			plugins: [rssPlugin, fetchPlugin],
-		});
-		logger.info(`Created internal HTTP server`);
-
 		logger.info(`Starting core`);
 		const core = new EInkRendererCore({
 			browser,
 			broker: new MQTTJSMessageBrokerWrapper(mqtt),
-			internalHTTPServer,
 		});
 		await core.run();
-	} catch (err) {
-		logger.error(err);
+	} catch (error) {
+		logger.error(error);
 	} finally {
 		logger.info(`Closing headless browser`);
 		await cleanup({ browser });
 	}
 }
-main().catch((err) => logger.error(err));
+main().catch((error) => logger.error(error));

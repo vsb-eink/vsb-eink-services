@@ -1,14 +1,14 @@
-import { QuantiseFunc } from './quantise.js';
+import { QuantiseFunc as QuantiseFunction } from './quantise.js';
 import { getPixel, ImageData, addToPixel, setPixel } from './image.js';
 import { clamp } from '../utils/math.js';
 
 export type DitherFunction = (
 	source: Readonly<ImageData>,
 	destination: ImageData,
-	quantise: QuantiseFunc
+	quantise: QuantiseFunction
 ) => void;
 
-export function floydSteinberg(source: Readonly<ImageData>, quantise: QuantiseFunc): ImageData {
+export function floydSteinberg(source: Readonly<ImageData>, quantise: QuantiseFunction): ImageData {
 	if (source.data.length !== source.width * source.height) {
 		throw new Error('Source must be of a single channel (for now)');
 	}

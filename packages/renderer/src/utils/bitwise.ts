@@ -6,8 +6,8 @@ export function numberOfOnes(n: number) {
 	const length = bitLength(n);
 	let cnt = 0;
 
-	for (let i = 0; i < length; ++i) {
-		cnt += (n >> i) % 2;
+	for (let index = 0; index < length; ++index) {
+		cnt += (n >> index) % 2;
 	}
 
 	return cnt;
@@ -22,10 +22,10 @@ export function oddParity(n: number) {
 export function packBits(bits: number[], bitLength: number = 1) {
 	let packed = 0;
 
-	for (let i = 0; i < bits.length; ++i) {
+	for (let index = 0; index < bits.length; ++index) {
 		// TODO: find easier way to do this
-		const offset = (bits.length - 1) * bitLength - i * bitLength;
-		packed |= bits[i] << offset;
+		const offset = (bits.length - 1) * bitLength - index * bitLength;
+		packed |= bits[index] << offset;
 	}
 
 	return packed;
