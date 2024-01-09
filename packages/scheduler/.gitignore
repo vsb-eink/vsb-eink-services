@@ -1,0 +1,11 @@
+# IDE
+.idea/
+
+# Node
+node_modules/
+
+# built files
+dist/
+
+# default crontab file location
+eink.cron
