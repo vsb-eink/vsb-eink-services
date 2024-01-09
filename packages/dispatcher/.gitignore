@@ -1,0 +1,12 @@
+# IDE
+.idea/
+
+# dependencies
+node_modules/
+
+# artifacts
+dist/
+
+# default config location
+groups.json
+
