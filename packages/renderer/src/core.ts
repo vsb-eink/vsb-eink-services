@@ -1,12 +1,8 @@
-import { rm , mkdir, writeFile } from 'node:fs/promises';
-import { join as joinPath } from 'node:path';
-
 import { Browser, BrowserContext } from 'playwright';
 
 import { AbstractMessageBroker } from './message-broker.js';
-import { InternalHTTPServer } from './internal-http/index.js';
 import { logger } from './logger.js';
-import { randomUUID } from 'node:crypto';
+import {fetchMimeType} from "./utils/http.js";
 
 
 class EInkRendererCore {
@@ -49,18 +45,22 @@ class EInkRendererCore {
 	}
 
 	private async handleDisplayHtml(topic: string, message: Buffer) {
-		const [, target, command, action, ...rest] = topic.split('/');
-		const html = message.toString('utf-8');
+		const [, target, _command, action, ..._rest] = topic.split('/');
+		const html = message.toString('utf8');
 		const [type, mode] = action.split('_');
 
-		const uuid = randomUUID();
-		const htmlDir = joinPath(this.internalHTTPServer.options.root, 'workdir', uuid);
-
-		let context: BrowserContext | null = null;
+		let context: BrowserContext | undefined;
 		try {
-			await mkdir(htmlDir, { recursive: true });
-			await writeFile(joinPath(htmlDir, 'index.html'), html);
-			logger.info(`Saved HTML to ${joinPath(htmlDir, 'index.html')}`);
+			const contentUrl = type === 'url' ? message.toString('utf8') : `data:text/html;base64,${message.toString('base64')}`;
+
+			// render only html content
+			if (type === 'url' && contentUrl.startsWith('http')) {
+				const mimeType = await fetchMimeType(html);
+
+				if (!mimeType.startsWith('text/html')) {
+					return;
+				}
+			}
 
 			context = await this.browser.newContext({});
 			context.on('console', (message_) =>
@@ -69,7 +69,7 @@ class EInkRendererCore {
 
 			const page = await context.newPage();
 			await page.setViewportSize({ width: 1200, height: 825 });
-			await page.goto(`${this.internalHTTPServerAddress}/workdir/${uuid}`, { waitUntil: 'networkidle' });
+			await page.goto(contentUrl, { waitUntil: 'networkidle' });
 
 			const screenshot = await page.screenshot({
 				type: 'png',
@@ -85,8 +85,6 @@ class EInkRendererCore {
 			logger.error(`Failed to render HTML: ${error}`);
 		} finally {
 			await context?.close();
-			await rm(htmlDir, { recursive: true, force: true });
-			logger.info(`Cleaned up ${htmlDir}`);
 		}
 	}
 }

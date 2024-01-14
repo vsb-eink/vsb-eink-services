@@ -21,6 +21,10 @@ export const isSupportedExtension = (
 ): extension is SupportedExtension =>
 	SUPPORTED_EXTENSIONS.includes(extension as any);
 
+export const SUPPORTED_MIME_TYPES = SUPPORTED_EXTENSIONS.map(ext => `image/${ext}`);
+export const isSupportedMimeType = (mimeType: string): mimeType is SupportedExtension =>
+	SUPPORTED_MIME_TYPES.includes(mimeType);
+
 export const SUPPORTED_MODES = ['1bpp', '4bpp'] as const;
 export type SupportedMode = (typeof SUPPORTED_MODES)[number];
 export const isSupportedMode = (mode: string): mode is SupportedMode =>

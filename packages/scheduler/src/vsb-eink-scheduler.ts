@@ -10,16 +10,16 @@ import FastifySensible from '@fastify/sensible';
 import { EInkSchedulerCore } from './core.js';
 import { logger } from './logger.js';
 import {
-	API_HOST,
-	API_PORT,
-	BROKER_HOST,
+	HOST,
+	PORT,
+	MQTT_URL,
 	CRONTAB_PATH,
 } from './environment.js';
 import { apiRouter } from './api/server.js';
 
-logger.info(`Connecting to MQTT broker at ${BROKER_HOST}`);
+logger.info(`Connecting to MQTT broker at ${MQTT_URL}`);
 const mqtt = await connectAsync(
-	BROKER_HOST.startsWith('mqtt://') ? BROKER_HOST : `mqtt://${BROKER_HOST}`,
+	MQTT_URL.startsWith('mqtt://') ? MQTT_URL : `mqtt://${MQTT_URL}`,
 );
 
 const core = new EInkSchedulerCore({
@@ -54,8 +54,8 @@ const httpServer = Fastify();
 await httpServer.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 await httpServer.register(apiRouter, { prefix: '/' });
 await httpServer.listen({
-	port: API_PORT,
-	host: API_HOST,
+	port: PORT,
+	host: HOST,
 	listenTextResolver: (address) => {
 		return `Listening on ${address}`;
 	},

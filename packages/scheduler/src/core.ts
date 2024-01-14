@@ -1,6 +1,5 @@
-import { extname } from 'node:path';
+import { extname , join as joinPath } from 'node:path';
 import { readFile, constants } from 'node:fs/promises';
-import { join as joinPath } from 'node:path';
 
 import { parseCronExpression } from 'cron-schedule';
 import { set } from 'date-fns';
