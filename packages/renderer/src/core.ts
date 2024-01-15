@@ -2,20 +2,13 @@ import { Browser, BrowserContext } from 'playwright';
 
 import { AbstractMessageBroker } from './message-broker.js';
 import { logger } from './logger.js';
-import {fetchMimeType} from "./utils/http.js";
-
+import { fetchMimeType } from './utils/http.js';
 
 class EInkRendererCore {
 	private broker: AbstractMessageBroker;
 	private browser: Browser;
 
-	constructor({
-		broker,
-		browser
-	}: {
-		broker: AbstractMessageBroker;
-		browser: Browser;
-	}) {
+	constructor({ broker, browser }: { broker: AbstractMessageBroker; browser: Browser }) {
 		this.broker = broker;
 		this.browser = browser;
 	}
@@ -23,16 +16,28 @@ class EInkRendererCore {
 	async run() {
 		try {
 			await this.broker.subscribe(`vsb-eink/+/display/html_1bpp/set`);
-			await this.broker.setHandler(`vsb-eink/+/display/html_1bpp/set`, this.handleDisplayHtml.bind(this));
+			await this.broker.setHandler(
+				`vsb-eink/+/display/html_1bpp/set`,
+				this.handleDisplayHtml.bind(this),
+			);
 
 			await this.broker.subscribe(`vsb-eink/+/display/html_4bpp/set`);
-			await this.broker.setHandler(`vsb-eink/+/display/html_4bpp/set`, this.handleDisplayHtml.bind(this));
+			await this.broker.setHandler(
+				`vsb-eink/+/display/html_4bpp/set`,
+				this.handleDisplayHtml.bind(this),
+			);
 
 			await this.broker.subscribe(`vsb-eink/+/display/url_1bpp/set`);
-			await this.broker.setHandler(`vsb-eink/+/display/url_1bpp/set`, this.handleDisplayHtml.bind(this));
+			await this.broker.setHandler(
+				`vsb-eink/+/display/url_1bpp/set`,
+				this.handleDisplayHtml.bind(this),
+			);
 
 			await this.broker.subscribe(`vsb-eink/+/display/url_4bpp/set`);
-			await this.broker.setHandler(`vsb-eink/+/display/url_4bpp/set`, this.handleDisplayHtml.bind(this));
+			await this.broker.setHandler(
+				`vsb-eink/+/display/url_4bpp/set`,
+				this.handleDisplayHtml.bind(this),
+			);
 		} catch (error) {
 			logger.error(`Failed to subscribe to MQTT topics: ${error}`);
 			return;
@@ -51,7 +56,10 @@ class EInkRendererCore {
 
 		let context: BrowserContext | undefined;
 		try {
-			const contentUrl = type === 'url' ? message.toString('utf8') : `data:text/html;base64,${message.toString('base64')}`;
+			const contentUrl =
+				type === 'url'
+					? message.toString('utf8')
+					: `data:text/html;base64,${message.toString('base64')}`;
 
 			// render only html content
 			if (type === 'url' && contentUrl.startsWith('http')) {
@@ -63,9 +71,7 @@ class EInkRendererCore {
 			}
 
 			context = await this.browser.newContext({});
-			context.on('console', (message_) =>
-				logger.info(`Browser console: ${message_.text()}`),
-			);
+			context.on('console', (message_) => logger.info(`Browser console: ${message_.text()}`));
 
 			const page = await context.newPage();
 			await page.setViewportSize({ width: 1200, height: 825 });
@@ -77,10 +83,7 @@ class EInkRendererCore {
 				scale: 'css',
 			});
 
-			await this.broker.publish(
-				`vsb-eink/${target}/display/png_${mode}/set`,
-				screenshot,
-			);
+			await this.broker.publish(`vsb-eink/${target}/display/png_${mode}/set`, screenshot);
 		} catch (error) {
 			logger.error(`Failed to render HTML: ${error}`);
 		} finally {

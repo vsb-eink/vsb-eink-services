@@ -1,5 +1,4 @@
-import { TextEncoder , EncodeIntoResult } from 'node:util';
-
+import { TextEncoder, EncodeIntoResult } from 'node:util';
 
 const textEncoder = new TextEncoder();
 

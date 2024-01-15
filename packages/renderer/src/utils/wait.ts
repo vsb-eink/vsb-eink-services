@@ -8,7 +8,7 @@ interface WaitForOptions {
 }
 export async function waitFor(
 	stateFunction: (() => boolean) | (() => Promise<boolean>),
-	options?: WaitForOptions
+	options?: WaitForOptions,
 ): Promise<void> {
 	const options_: Required<WaitForOptions> = {
 		delay: options?.delay ?? 50,

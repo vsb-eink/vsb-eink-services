@@ -29,19 +29,13 @@ export interface EInkJobDisplayPartial extends EInkJob {
 	action: EInkJobAction.DISPLAY_PARTIAL;
 }
 
-export function isEInkJobDisplayPartial(
-	job: EInkJob,
-): job is EInkJobDisplayPartial {
+export function isEInkJobDisplayPartial(job: EInkJob): job is EInkJobDisplayPartial {
 	return job.action === EInkJobAction.DISPLAY_PARTIAL;
 }
 
 export function parseJob(fields: string[]): EInkJob {
 	if (fields.length < 7) {
-		throw new Error(
-			`Invalid crontab line, not enough fields: ${JSON.stringify(
-				fields,
-			)}`,
-		);
+		throw new Error(`Invalid crontab line, not enough fields: ${JSON.stringify(fields)}`);
 	}
 
 	const when = fields.slice(0, 5).join(' ');
@@ -107,9 +101,7 @@ export async function writeJobsToCrontab(path: string, jobs: EInkJob[]) {
 
 		// jobs
 		for (const job of jobs) {
-			content += stringifyCSV([
-				[job.when, job.target, job.action, ...job.args],
-			]);
+			content += stringifyCSV([[job.when, job.target, job.action, ...job.args]]);
 		}
 
 		await writeFile(path, content);

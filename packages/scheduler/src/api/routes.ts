@@ -1,14 +1,7 @@
-import {
-	FastifyPluginAsyncTypebox,
-	Type,
-} from '@fastify/type-provider-typebox';
+import { FastifyPluginAsyncTypebox, Type } from '@fastify/type-provider-typebox';
 
 import { HttpErrorSchema, EmptyBodySchema } from './schemas.js';
-import {
-	loadJobsFromCrontab,
-	readCrontabFile,
-	writeCrontabFile,
-} from '../crontab.js';
+import { loadJobsFromCrontab, readCrontabFile, writeCrontabFile } from '../crontab.js';
 import { CRONTAB_PATH } from '../environment.js';
 
 export const crontabRouter: FastifyPluginAsyncTypebox = async (app) => {

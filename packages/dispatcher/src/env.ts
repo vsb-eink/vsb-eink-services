@@ -1,15 +1,10 @@
 import env from 'env-var';
 
-export const BROKER_HOST = env
-	.get('BROKER_HOST')
-	.default('localhost')
-	.asString();
-export const BROKER_PORT = env.get('BROKER_PORT').default(1883).asPortNumber();
+export const MQTT_HOST = env.get('MQTT_HOST').default('localhost').asString();
+export const MQTT_PORT = env.get('MQTT_PORT').default(1883).asPortNumber();
+export const MQTT_URL = env.get('MQTT_URL').default(`mqtt://${MQTT_HOST}:${MQTT_PORT}`).asString();
 
 export const API_HOST = env.get('API_HOST').default('127.0.0.1').asString();
 export const API_PORT = env.get('API_PORT').default(3000).asPortNumber();
 
-export const GROUPS_FILE = env
-	.get('GROUPS_FILE')
-	.default('groups.json')
-	.asString();
+export const GROUPS_FILE = env.get('GROUPS_FILE').default('groups.json').asString();

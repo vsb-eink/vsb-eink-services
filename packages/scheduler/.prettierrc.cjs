@@ -3,6 +3,7 @@ const config = {
 	tabWidth: 4,
 	useTabs: true,
 	singleQuote: true,
+	printWidth: 100,
 	overrides: [
 		{
 			files: '*.json',

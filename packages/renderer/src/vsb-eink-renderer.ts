@@ -6,14 +6,12 @@ import { logger } from './logger.js';
 import { connectAsync } from 'mqtt';
 import { EInkRendererCore } from './core.js';
 import { MQTTJSMessageBrokerWrapper } from './message-broker.js';
-import { BROKER_HOST } from "./environment.js";
+import { MQTT_URL } from './environment.js';
 
 async function cleanup({ browser }: { browser?: Browser }) {
 	if (browser) {
 		logger.info(`Closing browser contexts`);
-		await Promise.all(
-			browser.contexts().map(async (context) => context.close()),
-		);
+		await Promise.all(browser.contexts().map(async (context) => context.close()));
 		logger.info(`Closing browser`);
 		await browser.close();
 	}
@@ -29,14 +27,17 @@ function signalHandler(context: { browser: Browser }) {
 	};
 }
 
-logger.info(`Connecting to MQTT broker at ${BROKER_HOST}`);
-const mqtt = await connectAsync(
-	BROKER_HOST.startsWith('mqtt://') ? BROKER_HOST : `mqtt://${BROKER_HOST}`,
-);
+logger.info(`Connecting to MQTT broker at ${MQTT_URL}`);
+const mqtt = await connectAsync(MQTT_URL);
 
 logger.info(`Loaunching headless browser`);
 const browser = await chromium.launch({
-	args: ['--disable-lcd-text', '--disable-font-subpixel-positioning', '--unsafely-treat-insecure-origin-as-secure', '--headless=new'],
+	args: [
+		'--disable-lcd-text',
+		'--disable-font-subpixel-positioning',
+		'--unsafely-treat-insecure-origin-as-secure',
+		'--headless=new',
+	],
 });
 process.once('SIGINT', signalHandler({ browser }));
 process.once('SIGTERM', signalHandler({ browser }));

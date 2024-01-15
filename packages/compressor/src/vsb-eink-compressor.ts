@@ -2,19 +2,19 @@
 
 import sharp from 'sharp';
 import { connectAsync } from 'mqtt';
-import { MQTT_HOST, MQTT_PORT } from './env.js';
+import { MQTT_URL } from './env.js';
 import {
-	isSupportedExtension, isSupportedMimeType,
+	isSupportedMimeType,
 	isSupportedMode,
 	SUPPORTED_EXTENSIONS,
 	SUPPORTED_MODES,
 	toRawInkplate10Buffer,
 } from './graphics/compress.js';
-import {fetchMimeType} from "./utils/http.js";
+import { fetchMimeType } from './utils/http.js';
 
-console.log(`Connecting to MQTT broker at ${MQTT_HOST}:${MQTT_PORT}`);
-const mqtt = await connectAsync(`mqtt://${MQTT_HOST}:${MQTT_PORT}`);
-console.log(`Connected to MQTT broker at ${MQTT_HOST}:${MQTT_PORT}`);
+console.log(`Connecting to MQTT broker at ${MQTT_URL}`);
+const mqtt = await connectAsync(MQTT_URL);
+console.log(`Connected to MQTT broker at ${MQTT_URL}`);
 
 // image types
 for (const type of SUPPORTED_EXTENSIONS) {
@@ -43,9 +43,10 @@ mqtt.on('message', async (topic, payload) => {
 	const [extension, mode] = format.split('_');
 
 	try {
-		const mimeType = extension === 'url' ?
-			await fetchMimeType(payload.toString('utf8')) :
-			`image/${extension}`;
+		const mimeType =
+			extension === 'url'
+				? await fetchMimeType(payload.toString('utf8'))
+				: `image/${extension}`;
 
 		if (!isSupportedMimeType(mimeType)) {
 			console.error(`Unsupported image type: ${extension}`);
@@ -60,13 +61,8 @@ mqtt.on('message', async (topic, payload) => {
 		const image = sharp(payload);
 		const compressed = await toRawInkplate10Buffer(image, mode);
 
-		await mqtt.publishAsync(
-			`vsb-eink/${target}/display/raw_${mode}/set`,
-			compressed,
-		);
-		console.log(
-			`Published message on vsb-eink/${target}/display/raw_${mode}/set`,
-		);
+		await mqtt.publishAsync(`vsb-eink/${target}/display/raw_${mode}/set`, compressed);
+		console.log(`Published message on vsb-eink/${target}/display/raw_${mode}/set`);
 	} catch (error) {
 		console.error(`Failed to compress image: ${error}`);
 	}

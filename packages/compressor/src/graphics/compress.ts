@@ -6,22 +6,12 @@ import { changeDepth } from './depth.js';
 import { toChunks } from '../utils/chunks.js';
 import { packBits, packNibbles } from '../utils/bitwise.js';
 
-export const SUPPORTED_EXTENSIONS = [
-	'jpg',
-	'jpeg',
-	'png',
-	'webp',
-	'gif',
-	'avif',
-	'svg',
-] as const;
+export const SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'svg'] as const;
 export type SupportedExtension = (typeof SUPPORTED_EXTENSIONS)[number];
-export const isSupportedExtension = (
-	extension: string,
-): extension is SupportedExtension =>
+export const isSupportedExtension = (extension: string): extension is SupportedExtension =>
 	SUPPORTED_EXTENSIONS.includes(extension as any);
 
-export const SUPPORTED_MIME_TYPES = SUPPORTED_EXTENSIONS.map(ext => `image/${ext}`);
+export const SUPPORTED_MIME_TYPES = SUPPORTED_EXTENSIONS.map((ext) => `image/${ext}`);
 export const isSupportedMimeType = (mimeType: string): mimeType is SupportedExtension =>
 	SUPPORTED_MIME_TYPES.includes(mimeType);
 

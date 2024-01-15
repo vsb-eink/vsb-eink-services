@@ -4,10 +4,7 @@ import { matches as topicMatches } from 'mqtt-pattern';
 import { logger } from './logger.js';
 
 export class MQTTJSMessageBrokerWrapper implements AbstractMessageBroker {
-	private handlers = new Map<
-		string,
-		(topic: string, message: Buffer) => Promise<void>
-	>();
+	private handlers = new Map<string, (topic: string, message: Buffer) => Promise<void>>();
 	private client: MqttClient;
 
 	constructor(client: MqttClient) {

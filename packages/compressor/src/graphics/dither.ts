@@ -5,7 +5,7 @@ import { clamp } from '../utils/math.js';
 export type DitherFunction = (
 	source: Readonly<ImageData>,
 	destination: ImageData,
-	quantise: QuantiseFunc
+	quantise: QuantiseFunc,
 ) => void;
 
 export function floydSteinberg(source: Readonly<ImageData>, quantise: QuantiseFunc): ImageData {

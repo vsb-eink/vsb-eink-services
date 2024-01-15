@@ -17,9 +17,7 @@ export async function canAccess(path: PathLike, mode?: number | undefined) {
 }
 
 export async function sleep({ minutes = 0, seconds = 0, ms = 0 }) {
-	return new Promise((resolve) =>
-		setTimeout(resolve, ms + seconds * 1000 + minutes * 60 * 1000),
-	);
+	return new Promise((resolve) => setTimeout(resolve, ms + seconds * 1000 + minutes * 60 * 1000));
 }
 
 export async function getLastModifiedDate(path: PathLike) {

@@ -1,16 +1,10 @@
-import { extname , join as joinPath } from 'node:path';
+import { extname, join as joinPath } from 'node:path';
 import { readFile, constants } from 'node:fs/promises';
 
 import { parseCronExpression } from 'cron-schedule';
 import { set } from 'date-fns';
 
-import {
-	canAccess,
-	getLastModifiedDate,
-	isHttpUrl,
-	joinUrl,
-	sleep,
-} from './utils.js';
+import { canAccess, getLastModifiedDate, isHttpUrl, joinUrl, sleep } from './utils.js';
 import { logger } from './logger.js';
 import {
 	EInkJob,
@@ -38,8 +32,7 @@ class EInkSchedulerCore {
 		const jobIterations = new Map<number, number>();
 		while (this.running) {
 			// check if the crontab file has been modified
-			const crontabModificationTime =
-				await getLastModifiedDate(CRONTAB_PATH);
+			const crontabModificationTime = await getLastModifiedDate(CRONTAB_PATH);
 
 			// reload the crontab file if it has been modified
 			if (lastCrontabModificationTime < crontabModificationTime) {
@@ -60,16 +53,11 @@ class EInkSchedulerCore {
 					continue;
 				}
 
-				logger.info(
-					`Executing job ${job.when} ${job.target} ${job.action} ${job.args}`,
-				);
+				logger.info(`Executing job ${job.when} ${job.target} ${job.action} ${job.args}`);
 
 				const argumentIndex = jobIterations.get(jobIndex) ?? 0;
 				try {
-					const { format, mode } = await this.analyseJob(
-						job,
-						argumentIndex,
-					);
+					const { format, mode } = await this.analyseJob(job, argumentIndex);
 					const topic = this.getTopic(job.target, format, mode);
 
 					const buffer =
@@ -85,10 +73,7 @@ class EInkSchedulerCore {
 					logger.error(error);
 				} finally {
 					// increment the iteration counter
-					jobIterations.set(
-						jobIndex,
-						(argumentIndex + 1) % job.args.length,
-					);
+					jobIterations.set(jobIndex, (argumentIndex + 1) % job.args.length);
 				}
 
 				// always go from the first job top down, thus allowing only one job to run at a time
@@ -124,15 +109,12 @@ class EInkSchedulerCore {
 		const path = isHttpUrl(job.args[argumentIndex])
 			? job.args[argumentIndex]
 			: isHttpUrl(CONTENT_PATH)
-			  ? joinUrl(CONTENT_PATH, job.args[argumentIndex])
-			  : joinPath(CONTENT_PATH, job.args[argumentIndex]);
+				? joinUrl(CONTENT_PATH, job.args[argumentIndex])
+				: joinPath(CONTENT_PATH, job.args[argumentIndex]);
 
 		const isURL = isHttpUrl(path);
 
-		const isLocal = await canAccess(
-			job.args[argumentIndex],
-			constants.R_OK,
-		);
+		const isLocal = await canAccess(job.args[argumentIndex], constants.R_OK);
 
 		const extension = extname(job.args[argumentIndex]).slice(1);
 		const isBinary = isLocal && extension === 'bin';

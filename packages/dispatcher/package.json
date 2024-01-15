@@ -1,5 +1,5 @@
 {
-  "name": "vsb-eink-dispatcher",
+  "name": "vsb-eink-grouper",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@fastify/sensible": "^5.5.0",
-    "@fastify/type-provider-typebox": "^3.5.0",
+    "@fastify/type-provider-typebox": "^3.6.0",
     "env-var": "^7.4.1",
     "fastify": "^4.24.3",
     "lowdb": "^6.1.1",

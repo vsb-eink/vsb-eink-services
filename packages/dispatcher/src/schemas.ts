@@ -1,5 +1,4 @@
 import { Type } from '@fastify/type-provider-typebox';
-import exp from 'constants';
 
 export const PanelNameSchema = Type.String();
 

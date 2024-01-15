@@ -1,8 +1,4 @@
-import {
-	FastifyPluginAsyncTypebox,
-	Static,
-	Type,
-} from '@fastify/type-provider-typebox';
+import { FastifyPluginAsyncTypebox, Static, Type } from '@fastify/type-provider-typebox';
 
 import {
 	GroupNameSchema,
@@ -45,9 +41,7 @@ export const groupsRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 		async (req, reply) => {
 			const { name, panels } = req.body;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === name,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === name);
 			if (existingGroup !== undefined) {
 				return reply.conflict();
 			}
@@ -99,9 +93,7 @@ export const groupRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 		async (req, reply) => {
 			const { groupName } = req.params;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}
@@ -126,9 +118,7 @@ export const groupRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 			const { groupName } = req.params;
 			const { panels } = req.body;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}
@@ -162,9 +152,7 @@ export const groupRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 			const { groupName } = req.params;
 			const { panels } = req.body;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				store.data.groups.push({ name: groupName, panels });
 				return reply.status(204);
@@ -225,9 +213,7 @@ export const panelsRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 		async (req, reply) => {
 			const { groupName } = req.params;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}
@@ -252,16 +238,12 @@ export const panelsRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 			const { groupName } = req.params;
 			const newPanel = req.body;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}
 
-			const isPanelInGroup = existingGroup.panels.findIndex(
-				(panel) => panel === newPanel,
-			);
+			const isPanelInGroup = existingGroup.panels.findIndex((panel) => panel === newPanel);
 			if (isPanelInGroup) {
 				return reply.status(409);
 			}
@@ -288,9 +270,7 @@ export const panelsRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 			const { groupName } = req.params;
 			const newPanels = req.body;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}
@@ -327,16 +307,12 @@ export const panelRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 		async (req, reply) => {
 			const { groupName, panelName } = req.params;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}
 
-			const isPanelInGroup = existingGroup.panels.findIndex(
-				(panel) => panel === panelName,
-			);
+			const isPanelInGroup = existingGroup.panels.findIndex((panel) => panel === panelName);
 			if (isPanelInGroup) {
 				return;
 			}
@@ -361,9 +337,7 @@ export const panelRouter: FastifyPluginAsyncTypebox = async (app, opts) => {
 		async (req, reply) => {
 			const { groupName, panelName } = req.params;
 
-			const existingGroup = store.data.groups.find(
-				(group) => group.name === groupName,
-			);
+			const existingGroup = store.data.groups.find((group) => group.name === groupName);
 			if (existingGroup === undefined) {
 				return reply.notFound();
 			}

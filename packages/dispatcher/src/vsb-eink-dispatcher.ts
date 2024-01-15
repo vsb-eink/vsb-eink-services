@@ -22,19 +22,14 @@ await mqtt.subscribeAsync('vsb-eink/+/display/raw_4bpp/set');
 mqtt.on('message', async (topic, message) => {
 	const [prefix, target, command, format, ...rest] = topic.split('/');
 
-	const existingGroup = store.data.groups.find(
-		(group) => group.name === target,
-	);
+	const existingGroup = store.data.groups.find((group) => group.name === target);
 	if (existingGroup === undefined) {
 		return;
 	}
 
 	const panelsInGroup = existingGroup.panels ?? [];
 	for (const panel of panelsInGroup) {
-		await mqtt.publishAsync(
-			`vsb-eink/${panel}/display/${format}/set`,
-			message,
-		);
+		await mqtt.publishAsync(`vsb-eink/${panel}/display/${format}/set`, message);
 	}
 });
 
