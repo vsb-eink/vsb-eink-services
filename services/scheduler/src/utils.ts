@@ -1,7 +1,6 @@
 import { PathLike } from 'node:fs';
 import { access, stat } from 'node:fs/promises';
 import { join as joinPosixPath } from 'node:path/posix';
-import { Err } from 'cron-validate/lib/result.js';
 
 export function isEmpty(value: unknown) {
 	return value && Object.keys(value).length === 0;

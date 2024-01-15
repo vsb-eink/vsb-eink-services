@@ -1,5 +1,5 @@
 {
-  "name": "vsb-eink-scheduler",
+  "name": "@vsb-eink/scheduler",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -12,14 +12,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prettier": "@vsb-eink/prettier-config",
   "devDependencies": {
     "@types/node": "^20.9.0",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.11.0",
+    "@vsb-eink/eslint-config": "workspace:^",
+    "@vsb-eink/prettier-config": "workspace:^",
+    "@vsb-eink/tsconfig": "workspace:^",
     "eslint": "^8.56.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-unicorn": "^50.0.1",
     "prettier": "^3.1.0",
     "tsx": "^4.1.1",
     "typescript": "^5.2.2"

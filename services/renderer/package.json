@@ -1,5 +1,5 @@
 {
-  "name": "vsb-eink-renderer",
+  "name": "@vsb-eink/renderer",
   "version": "1.1.1",
   "description": "",
   "bin": "./dist/vsb-eink-renderer.js",
@@ -14,6 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prettier": "@vsb-eink/prettier-config",
   "dependencies": {
     "@fastify/cors": "^8.4.1",
     "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
@@ -30,12 +31,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.8.6",
-    "@typescript-eslint/eslint-plugin": "^6.17.0",
-    "@typescript-eslint/parser": "^6.17.0",
+    "@vsb-eink/eslint-config": "workspace:^",
+    "@vsb-eink/prettier-config": "workspace:^",
+    "@vsb-eink/tsconfig": "workspace:^",
     "eslint": "^8.56.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-unicorn": "^50.0.1",
     "prettier": "^3.1.0",
     "typescript": "^5.2.2"
   }

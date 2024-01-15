@@ -1,5 +1,5 @@
 {
-  "name": "vsb-eink-grouper",
+  "name": "@vsb-eink/grouper",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -11,8 +11,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prettier": "@vsb-eink/prettier-config",
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@vsb-eink/eslint-config": "workspace:^",
+    "@vsb-eink/prettier-config": "workspace:^",
+    "@vsb-eink/tsconfig": "workspace:^",
     "prettier": "^3.1.0",
     "tsx": "^4.5.0",
     "typescript": "^5.3.2"
