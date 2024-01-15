@@ -8,7 +8,7 @@ importers:
 
   .: {}
 
-  packages/compressor:
+  services/compressor:
     dependencies:
       env-var:
         specifier: ^7.4.1
@@ -33,14 +33,14 @@ importers:
         specifier: ^5.3.2
         version: 5.3.3
 
-  packages/dispatcher:
+  services/grouper:
     dependencies:
       '@fastify/sensible':
         specifier: ^5.5.0
         version: 5.5.0
       '@fastify/type-provider-typebox':
-        specifier: ^3.5.0
-        version: 3.6.0(@sinclair/typebox@0.32.8)
+        specifier: ^3.6.0
+        version: 3.6.0(@sinclair/typebox@0.32.9)
       env-var:
         specifier: ^7.4.1
         version: 7.4.1
@@ -67,7 +67,7 @@ importers:
         specifier: ^5.3.2
         version: 5.3.3
 
-  packages/renderer:
+  services/renderer:
     dependencies:
       '@fastify/cors':
         specifier: ^8.4.1
@@ -134,14 +134,14 @@ importers:
         specifier: ^5.2.2
         version: 5.3.3
 
-  packages/scheduler:
+  services/scheduler:
     dependencies:
       '@fastify/sensible':
         specifier: ^5.5.0
         version: 5.5.0
       '@fastify/type-provider-typebox':
         specifier: ^3.5.0
-        version: 3.6.0(@sinclair/typebox@0.32.8)
+        version: 3.6.0(@sinclair/typebox@0.32.9)
       async-mutex:
         specifier: ^0.4.0
         version: 0.4.0
@@ -554,12 +554,12 @@ packages:
       json-schema-to-ts: 2.12.0
     dev: false
 
-  /@fastify/type-provider-typebox@3.6.0(@sinclair/typebox@0.32.8):
+  /@fastify/type-provider-typebox@3.6.0(@sinclair/typebox@0.32.9):
     resolution: {integrity: sha512-HTeOLvirfGg0u1KGao3iXn5rZpYNqlrOmyDnXSXAbWVPa+mDQTTBNs/x5uZzOB6vFAqr0Xcf7x1lxOamNSYKjw==}
     peerDependencies:
       '@sinclair/typebox': '>=0.26 <=0.32'
     dependencies:
-      '@sinclair/typebox': 0.32.8
+      '@sinclair/typebox': 0.32.9
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -616,8 +616,8 @@ packages:
       playwright-core: 1.40.1
     dev: false
 
-  /@sinclair/typebox@0.32.8:
-    resolution: {integrity: sha512-ifqNG6GBr0QRao2Vy+2P2WzxkOnpGmHfZCFXWwuR/0elH4h79mGXN8mEYwnJ2qGEr7MGgfqvf8Njwj4dBGFMBA==}
+  /@sinclair/typebox@0.32.9:
+    resolution: {integrity: sha512-6oeJJPTIb0y3cs713HmXmXSx3WRWgid74KICYL9blOhNFuAcAB18dDWfATgcgzynfpF5xDzHGxEVbDYYr6nvgg==}
     dev: false
 
   /@types/json-schema@7.0.15:
