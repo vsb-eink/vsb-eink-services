@@ -10,7 +10,7 @@ import {
 	SUPPORTED_MODES,
 	toRawInkplate10Buffer,
 } from './graphics/compress.js';
-import { fetchMimeType } from './utils/http.js';
+import {fetchBuffer, fetchMimeType} from './utils/http.js';
 
 console.log(`Connecting to MQTT broker at ${MQTT_URL}`);
 const mqtt = await connectAsync(MQTT_URL);
@@ -58,12 +58,15 @@ mqtt.on('message', async (topic, payload) => {
 			return;
 		}
 
-		const image = sharp(payload);
+		const image = sharp(extension === 'url' ? await fetchBuffer(payload.toString()) : payload);
 		const compressed = await toRawInkplate10Buffer(image, mode);
+
+		console.log(`Compressed image to ${compressed.length} bytes`);
 
 		await mqtt.publishAsync(`vsb-eink/${target}/display/raw_${mode}/set`, compressed);
 		console.log(`Published message on vsb-eink/${target}/display/raw_${mode}/set`);
 	} catch (error) {
 		console.error(`Failed to compress image: ${error}`);
+		console.trace(error);
 	}
 });

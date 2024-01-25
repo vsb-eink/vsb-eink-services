@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/vsb-eink-compressor.js"
+    "start": "node dist/vsb-eink-compressor.js",
+    "test": "tsx --test **/*.test.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "files": [
+    "dist",
+    "README"
+  ],
   "prettier": "@vsb-eink/prettier-config",
   "dependencies": {
     "env-var": "^7.4.1",

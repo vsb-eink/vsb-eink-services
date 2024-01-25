@@ -17,4 +17,4 @@ export const PanelsSchema = Type.Array(PanelNameSchema);
 
 export const HttpErrorSchema = Type.Ref('HttpError');
 
-export const VoidSchema = Type.Void();
+export const VoidSchema = Type.Null();

@@ -14,17 +14,20 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "files": [
+    "dist",
+    "README"
+  ],
   "prettier": "@vsb-eink/prettier-config",
   "dependencies": {
     "@fastify/cors": "^8.4.1",
     "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
-    "@playwright/browser-chromium": "^1.39.0",
     "env-var": "^7.4.1",
     "fastify": "^4.24.3",
     "fastify-plugin": "^4.5.1",
     "mqtt": "^5.2.2",
     "mqtt-pattern": "^2.1.0",
-    "playwright": "^1.39.0",
+    "playwright": "^1.41.1",
     "rss-to-json": "^2.1.1",
     "sharp": "^0.32.6",
     "winston": "^3.11.0"

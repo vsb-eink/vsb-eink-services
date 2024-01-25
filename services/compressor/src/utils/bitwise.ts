@@ -1,3 +1,5 @@
+import * as assert from 'node:assert/strict';
+
 export function bitLength(n: number) {
 	return Math.trunc(Math.log2(n) + 1);
 }

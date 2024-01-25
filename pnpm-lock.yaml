@@ -71,7 +71,7 @@ importers:
         version: 5.5.0
       '@fastify/type-provider-typebox':
         specifier: ^3.6.0
-        version: 3.6.0(@sinclair/typebox@0.32.9)
+        version: 3.6.0(@sinclair/typebox@0.32.12)
       env-var:
         specifier: ^7.4.1
         version: 7.4.1
@@ -115,9 +115,6 @@ importers:
       '@fastify/type-provider-json-schema-to-ts':
         specifier: ^2.2.2
         version: 2.2.2(fastify@4.25.2)(json-schema-to-ts@2.12.0)
-      '@playwright/browser-chromium':
-        specifier: ^1.39.0
-        version: 1.40.1
       env-var:
         specifier: ^7.4.1
         version: 7.4.1
@@ -134,8 +131,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       playwright:
-        specifier: ^1.39.0
-        version: 1.40.1
+        specifier: ^1.41.1
+        version: 1.41.1
       rss-to-json:
         specifier: ^2.1.1
         version: 2.1.1
@@ -175,7 +172,7 @@ importers:
         version: 5.5.0
       '@fastify/type-provider-typebox':
         specifier: ^3.5.0
-        version: 3.6.0(@sinclair/typebox@0.32.9)
+        version: 3.6.0(@sinclair/typebox@0.32.12)
       async-mutex:
         specifier: ^0.4.0
         version: 0.4.0
@@ -577,12 +574,12 @@ packages:
       json-schema-to-ts: 2.12.0
     dev: false
 
-  /@fastify/type-provider-typebox@3.6.0(@sinclair/typebox@0.32.9):
+  /@fastify/type-provider-typebox@3.6.0(@sinclair/typebox@0.32.12):
     resolution: {integrity: sha512-HTeOLvirfGg0u1KGao3iXn5rZpYNqlrOmyDnXSXAbWVPa+mDQTTBNs/x5uZzOB6vFAqr0Xcf7x1lxOamNSYKjw==}
     peerDependencies:
       '@sinclair/typebox': '>=0.26 <=0.32'
     dependencies:
-      '@sinclair/typebox': 0.32.9
+      '@sinclair/typebox': 0.32.12
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -625,16 +622,8 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.16.0
 
-  /@playwright/browser-chromium@1.40.1:
-    resolution: {integrity: sha512-uNmjHYXBTYTfJkf89D6zVUcesCFzZ/yjkPj8FvBJQ6yf3na/j1rcjVNzx0PzOAGcWKioB/rnWRBi7b5ojOdCHA==}
-    engines: {node: '>=16'}
-    requiresBuild: true
-    dependencies:
-      playwright-core: 1.40.1
-    dev: false
-
-  /@sinclair/typebox@0.32.9:
-    resolution: {integrity: sha512-6oeJJPTIb0y3cs713HmXmXSx3WRWgid74KICYL9blOhNFuAcAB18dDWfATgcgzynfpF5xDzHGxEVbDYYr6nvgg==}
+  /@sinclair/typebox@0.32.12:
+    resolution: {integrity: sha512-uKRQW9a+alkPwZMzQk6W8cCZC117kZJZ3GQx3Yn9unu2oWX09PxEsyMF7D9tuvoH8se1hIZqLRja+FtU7HKGhQ==}
     dev: false
 
   /@types/json-schema@7.0.15:
@@ -2820,18 +2809,18 @@ packages:
       thread-stream: 2.4.1
     dev: false
 
-  /playwright-core@1.40.1:
-    resolution: {integrity: sha512-+hkOycxPiV534c4HhpfX6yrlawqVUzITRKwHAmYfmsVreltEl6fAZJ3DPfLMOODw0H3s1Itd6MDCWmP1fl/QvQ==}
+  /playwright-core@1.41.1:
+    resolution: {integrity: sha512-/KPO5DzXSMlxSX77wy+HihKGOunh3hqndhqeo/nMxfigiKzogn8kfL0ZBDu0L1RKgan5XHCPmn6zXd2NUJgjhg==}
     engines: {node: '>=16'}
     hasBin: true
     dev: false
 
-  /playwright@1.40.1:
-    resolution: {integrity: sha512-2eHI7IioIpQ0bS1Ovg/HszsN/XKNwEG1kbzSDDmADpclKc7CyqkHw7Mg2JCz/bbCxg25QUPcjksoMW7JcIFQmw==}
+  /playwright@1.41.1:
+    resolution: {integrity: sha512-gdZAWG97oUnbBdRL3GuBvX3nDDmUOuqzV/D24dytqlKt+eI5KbwusluZRGljx1YoJKZ2NRPaeWiFTeGZO7SosQ==}
     engines: {node: '>=16'}
     hasBin: true
     dependencies:
-      playwright-core: 1.40.1
+      playwright-core: 1.41.1
     optionalDependencies:
       fsevents: 2.3.2
     dev: false

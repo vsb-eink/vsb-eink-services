@@ -4,10 +4,17 @@ import { writeFile, readFile } from 'node:fs/promises';
 import cronValidate from 'cron-validate';
 import { parse as parseCSV, stringify as stringifyCSV } from 'csv/sync';
 import { Mutex } from 'async-mutex';
+import {logger} from "./logger.js";
+
+export const CONTINUE_KEYWORD = /#continue/;
 
 export enum EInkJobAction {
-	DISPLAY_FULL = 'full',
-	DISPLAY_PARTIAL = 'partial',
+	DISPLAY_FULL = 'display_full',
+	DISPLAY_PARTIAL = 'display_partial',
+}
+
+export interface EInkJobContext {
+	nonBlocking: boolean;
 }
 
 export interface EInkJob {
@@ -15,6 +22,7 @@ export interface EInkJob {
 	target: string;
 	action: EInkJobAction;
 	args: string[];
+	context?: EInkJobContext;
 }
 
 export interface EInkJobDisplayFull extends EInkJob {
@@ -39,12 +47,12 @@ export function parseJob(fields: string[]): EInkJob {
 	}
 
 	const when = fields.slice(0, 5).join(' ');
-	const target = fields[5];
-	const action = fields[6];
+	const action = fields[5];
+	const target = fields[6];
 	const arguments_ = fields.slice(7).filter((f) => f !== '');
 
 	// only full and partial actions are supported right now
-	if (!['full', 'partial'].includes(action)) {
+	if (!Object.values(EInkJobAction).includes(action as never)) {
 		throw new Error(`Invalid action: ${action}`);
 	}
 
@@ -76,18 +84,33 @@ export async function writeCrontabFile(path: PathLike, content: string) {
 
 export async function loadJobsFromCrontab(path: string): Promise<EInkJob[]> {
 	return crontabMutex.runExclusive(async () => {
-		const parseResult = parseCSV(await readFile(path, 'utf8'), {
+		const results = parseCSV(await readFile(path, 'utf8'), {
 			columns: false,
 			comment: '#',
 			delimiter: ' ',
 			trim: true,
-			skip_empty_lines: true,
-			skip_records_with_empty_values: true,
+			raw: true,
+			info: true,
+			relax_column_count: true,
 		});
 
 		const jobs: EInkJob[] = [];
-		for (const fields of parseResult) {
-			const job = parseJob(fields);
+		let continueKeywordFound = false;
+		for (const {record, info: metadata} of results) {
+			if (CONTINUE_KEYWORD.test(metadata.raw)) {
+				continueKeywordFound = true;
+			} else if (metadata.raw === '\n') {
+				continueKeywordFound = false;
+			}
+
+			const job = parseJob(record);
+
+			if (continueKeywordFound) {
+				job.context = {
+					nonBlocking: true,
+				};
+			}
+
 			jobs.push(job);
 		}
 

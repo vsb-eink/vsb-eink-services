@@ -4,7 +4,7 @@ import Fastify from 'fastify';
 import fastifySensible from '@fastify/sensible';
 import { connectAsync } from 'mqtt';
 
-import { API_HOST, API_PORT, GROUPS_FILE } from './env.js';
+import {API_HOST, API_PORT, GROUPS_FILE, MQTT_URL} from './env.js';
 import { store } from './store.js';
 import { apiRouter } from './api/server.js';
 
@@ -15,7 +15,7 @@ if (!existsSync(GROUPS_FILE)) {
 await store.read();
 
 // Subscribe to MQTT topics
-const mqtt = await connectAsync('mqtt://localhost');
+const mqtt = await connectAsync(MQTT_URL);
 await mqtt.subscribeAsync('vsb-eink/+/display/raw_1bpp/set');
 await mqtt.subscribeAsync('vsb-eink/+/display/raw_4bpp/set');
 

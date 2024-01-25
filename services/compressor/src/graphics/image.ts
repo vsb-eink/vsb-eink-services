@@ -21,3 +21,9 @@ export function setPixel(image: ImageData, x: number, y: number, pixel: number):
 export function addToPixel(image: ImageData, x: number, y: number, value: number): void {
 	return setPixel(image, x, y, getPixel(image, x, y) + value);
 }
+
+export function invert(image: ImageData): void {
+	for (let i = 0; i < image.data.length; ++i) {
+		image.data[i] = 255 - image.data[i];
+	}
+}

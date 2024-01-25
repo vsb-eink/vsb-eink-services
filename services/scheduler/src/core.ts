@@ -1,19 +1,20 @@
-import { extname, join as joinPath } from 'node:path';
-import { readFile, constants } from 'node:fs/promises';
+import {extname, join as joinPath} from 'node:path';
+import {constants, readFile} from 'node:fs/promises';
 
-import { parseCronExpression } from 'cron-schedule';
-import { set } from 'date-fns';
+import {parseCronExpression} from 'cron-schedule';
+import {set} from 'date-fns';
 
-import { canAccess, getLastModifiedDate, isHttpUrl, joinUrl, sleep } from './utils.js';
-import { logger } from './logger.js';
+import {canAccess, getLastModifiedDate, isHttpUrl, joinUrl, sleep} from './utils.js';
+import {logger} from './logger.js';
 import {
 	EInkJob,
+	EInkJobAction,
 	isEInkJobDisplayFull,
 	isEInkJobDisplayPartial,
 	loadJobsFromCrontab,
 } from './crontab.js';
-import { AbstractMessageBroker } from './message-broker.js';
-import { CONTENT_PATH, CRONTAB_PATH } from './environment.js';
+import {AbstractMessageBroker} from './message-broker.js';
+import {CONTENT_PATH, CRONTAB_PATH} from './environment.js';
 
 class EInkSchedulerCore {
 	private jobs: EInkJob[] = [];
@@ -53,7 +54,7 @@ class EInkSchedulerCore {
 					continue;
 				}
 
-				logger.info(`Executing job ${job.when} ${job.target} ${job.action} ${job.args}`);
+				logger.info(`Executing job ${job.when} ${job.action} ${job.target} ${job.args}`);
 
 				const argumentIndex = jobIterations.get(jobIndex) ?? 0;
 				try {
@@ -76,8 +77,12 @@ class EInkSchedulerCore {
 					jobIterations.set(jobIndex, (argumentIndex + 1) % job.args.length);
 				}
 
-				// always go from the first job top down, thus allowing only one job to run at a time
-				break;
+				// unless the job is non-blocking, stop the loop and wait for the next iteration
+				if (job.context?.nonBlocking) {
+					continue
+				} else {
+					break;
+				}
 			}
 
 			// stop the loop if the scheduler is stopped
@@ -104,7 +109,7 @@ class EInkSchedulerCore {
 			throw new Error(`Unsupported action: ${job.action}`);
 		}
 
-		const mode = job.action === 'full' ? '4bpp' : '1bpp';
+		const mode = job.action === EInkJobAction.DISPLAY_FULL ? '4bpp' : '1bpp';
 
 		const path = isHttpUrl(job.args[argumentIndex])
 			? job.args[argumentIndex]
