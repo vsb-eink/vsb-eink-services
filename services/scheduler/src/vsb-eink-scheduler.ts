@@ -1,51 +1,17 @@
 #!/usr/bin/env node
 
-import { existsSync } from 'node:fs';
+import { API_HOST, API_PORT } from './environment.js';
 
-import { connectAsync } from 'mqtt';
-import { matches as topicMatches } from 'mqtt-pattern';
-import Fastify from 'fastify';
-import FastifySensible from '@fastify/sensible';
-
-import { EInkSchedulerCore } from './core.js';
 import { logger } from './logger.js';
-import { API_HOST, API_PORT, CRONTAB_PATH, MQTT_URL } from './environment.js';
-import { apiRouter } from './api/server.js';
 
-logger.info(`Connecting to MQTT broker at ${MQTT_URL}`);
-const mqtt = await connectAsync(MQTT_URL);
+import { createServer } from './server/server.js';
+import { createScheduler } from './scheduler/scheduler.js';
 
-const core = new EInkSchedulerCore({
-	broker: {
-		publish: async (topic, message) => {
-			logger.info(`Publishing to ${topic}`);
-			await mqtt.publishAsync(topic, message);
-		},
-		subscribe: async (topic) => {
-			logger.info(`Subscribing to ${topic}`);
-			await mqtt.subscribeAsync(topic);
-		},
-		setHandler: async (topic, handler) => {
-			logger.info(`Setting MQTT handler`);
-			mqtt.on('message', (t, m) => {
-				logger.info(`Received message on ${t}`);
-				if (topicMatches(topic, t)) {
-					handler(t, m);
-				}
-			});
-		},
-	},
-});
-
-logger.info(`Loading crontab file at ${CRONTAB_PATH}`);
-if (!existsSync(CRONTAB_PATH)) {
-	logger.warn(`Crontab file not found at ${CRONTAB_PATH}`);
-}
+logger.info(`Starting scheduler`);
+const { stopScheduler } = createScheduler();
 
 logger.info(`Setting http api handler`);
-const httpServer = Fastify();
-await httpServer.register(FastifySensible, { sharedSchemaId: 'HttpError' });
-await httpServer.register(apiRouter, { prefix: '/api' });
+const httpServer = await createServer();
 await httpServer.listen({
 	port: API_PORT,
 	host: API_HOST,
@@ -54,5 +20,13 @@ await httpServer.listen({
 	},
 });
 
-logger.info(`Starting scheduling loop`);
-await core.loop();
+async function cleanUp() {
+	logger.info(`Stopping http server`);
+	await httpServer.close();
+
+	logger.info(`Stopping scheduler`);
+	await stopScheduler();
+}
+
+process.on('SIGINT', cleanUp);
+process.on('SIGTERM', cleanUp);

@@ -1,0 +1,36 @@
+{
+	"name": "@vsb-eink/hoster",
+	"version": "1.0.0",
+	"main": "src/vsb-eink-hoster.ts",
+	"type": "module",
+	"scripts": {
+		"start": "tsx src/vsb-eink-hoster.ts"
+	},
+	"files": [
+		"src",
+		"public",
+		"tsconfig.json",
+		"README.md"
+	],
+	"prettier": "@vsb-eink/prettier-config",
+	"devDependencies": {
+		"@types/node": "^20.11.16",
+		"@vsb-eink/eslint-config": "workspace:^",
+		"@vsb-eink/prettier-config": "workspace:^",
+		"@vsb-eink/tsconfig": "workspace:^",
+		"tsx": "^4.7.0",
+		"typescript": "^5.3.3"
+	},
+	"dependencies": {
+		"@fastify/autoload": "^5.8.0",
+		"@fastify/multipart": "^8.1.0",
+		"@fastify/reply-from": "^9.7.0",
+		"@fastify/restartable": "^2.2.0",
+		"@fastify/static": "^7.0.0",
+		"@fastify/url-data": "^5.4.0",
+		"axios": "^1.6.7",
+		"env-var": "^7.4.1",
+		"fastify": "^4.26.0",
+		"remove": "^0.1.5"
+	}
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>VŠB-EInk Počasí</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        :root {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <header style="background: black;">
+        <div style="float: left; color: white; font-size: xx-large; margin: 1rem">
+            <span id="date-text"></span>
+        </div>
+        <br class="clear" />
+    </header>
+
+    <div style="width: 100%; height: 1rem"></div>
+
+    <div id="ww_f7fe6dec810b5" v='1.3' loc='id' a='{"t":"responsive","lang":"cs","sl_lpl":1,"ids":["wl4415"],"font":"Arial","sl_ics":"one","sl_sot":"celsius","cl_bkg":"#FFFFFF00","cl_font":"#000000","cl_cloud":"#d4d4d4","cl_persp":"#2196F3","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722","cl_odd":"#00000000"}'>More forecasts: <a href="https://sharpweather.com/cs/prague/" id="ww_f7fe6dec810b5_u" target="_blank">Počasí Praha</a></div><script async src="https://app2.weatherwidget.org/js/?id=ww_f7fe6dec810b5"></script>
+
+    <div id="rss-widget" style="margin-left: 1rem">
+        <h2>Novinky</h2>
+    </div>
+
+    <script type="module">
+        // datum
+        document.getElementById('date-text').innerText = new Date().toLocaleString('cs-CZ');
+
+        // RSS
+        const proxyUrl = '/core/proxy.ts?url=';
+        const rssUrl = 'https://rss-bridge.org/bridge01/?action=display&bridge=FeedMergeBridge&feed_name=VSB-EInk+Novinky&feed_1=https%3A%2F%2Fnitter.cz%2Fvsbtuo%2Frss&feed_2=https%3A%2F%2Finfo.sso.vsb.cz%2Fcz.vsb.edison.info.web%2Frss%3ForgUnitId%3D1&feed_3=&feed_4=&feed_5=&feed_6=&feed_7=&feed_8=&feed_9=&feed_10=&limit=&format=Json';
+        const rss = await fetch(`${proxyUrl}${encodeURIComponent(rssUrl)}`).then(r => r.json());
+        const rssWidget = document.getElementById('rss-widget');
+        for (const item of rss.items.filter(item => item.content_text).slice(0, 3)) {
+            const pubDate = new Date(item.date_modified).toLocaleDateString();
+            const title = item.title;
+            const description = item.content_text;
+
+            rssWidget.innerHTML += `<div style="margin: 1rem 0">`;
+            rssWidget.innerHTML += `<div style="margin: 1rem 0">`;
+            rssWidget.innerHTML += `<span style="font-weight: bold">${title}</span><br/>`;
+            rssWidget.innerHTML += `<span style="font-size: smaller">${pubDate}</span><br/>`;
+            if (description) {
+                rssWidget.innerHTML += `<span>${description}</span>`;
+            }
+            rssWidget.innerHTML += `</div>`;
+        }
+    </script>
+</body>
+</html>

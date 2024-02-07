@@ -16,7 +16,8 @@ RUN pnpm install --offline && \
 RUN pnpm deploy --filter=compressor --prod /prod/compressor && \
     pnpm deploy --filter=grouper --prod /prod/grouper && \
     pnpm deploy --filter=renderer --prod /prod/renderer && \
-    pnpm deploy --filter=scheduler --prod /prod/scheduler
+    pnpm deploy --filter=scheduler --prod /prod/scheduler && \
+    pnpm deploy --filter=hoster --prod /prod/hoster
 
 FROM base AS compressor
 WORKDIR /app
@@ -37,5 +38,10 @@ CMD [ "pnpm", "start" ]
 FROM base AS scheduler
 WORKDIR /app
 COPY --from=build /prod/scheduler .
+EXPOSE 3000
+CMD [ "pnpm", "start" ]
+
+FROM base as hoster
+WORKDIR /app
 EXPOSE 3000
 CMD [ "pnpm", "start" ]

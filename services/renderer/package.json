@@ -23,7 +23,7 @@
     "@fastify/cors": "^8.4.1",
     "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
     "env-var": "^7.4.1",
-    "fastify": "^4.24.3",
+    "fastify": "^4.26.0",
     "fastify-plugin": "^4.5.1",
     "mqtt": "^5.2.2",
     "mqtt-pattern": "^2.1.0",

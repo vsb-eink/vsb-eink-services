@@ -11,6 +11,7 @@ module.exports = {
 	},
 	rules: {
 		'unicorn/no-nested-ternary': 'off',
+		'unicorn/prevent-abbreviations': 'off',
 		'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
 	}
 };

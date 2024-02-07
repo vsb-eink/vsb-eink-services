@@ -7,6 +7,4 @@ export const MQTT_URL = env.get('MQTT_URL').default(`mqtt://${MQTT_HOST}:${MQTT_
 export const API_HOST = env.get('API_HOST').default('0.0.0.0').asString();
 export const API_PORT = env.get('API_PORT').default(3000).asPortNumber();
 
-export const CRONTAB_PATH = env.get('CRONTAB_PATH').default('eink.cron').asString();
-
 export const CONTENT_PATH = env.get('CONTENT_PATH').default(process.cwd()).asString();
