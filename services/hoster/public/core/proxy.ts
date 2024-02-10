@@ -12,7 +12,7 @@ const handler: RouteHandler<{ Querystring: { url?: string } }> = async (request,
 
 	const remoteResponse = await axios({
 		url,
-		headers: request.headers,
+		headers: { ...request.headers, host: new URL(url).host },
 		method: request.method,
 		data: request.body,
 		validateStatus: () => true,

@@ -6,7 +6,6 @@ import { pathToFileURL } from 'node:url';
 import Fastify, { RouteHandlerMethod } from 'fastify';
 import FastifyStaticPlugin from '@fastify/static';
 import FastifyUrlDataPlugin from '@fastify/url-data';
-import FastifyReplyFrom from '@fastify/reply-from';
 
 import {
 	API_HOST,
