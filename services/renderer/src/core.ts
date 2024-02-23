@@ -50,6 +50,11 @@ class EInkRendererCore {
 	}
 
 	private async handleDisplayHtml(topic: string, message: Buffer) {
+		if (message.length === 0) {
+			logger.error('Payload is empty, skipping');
+			return;
+		}
+
 		const [, target, _command, action, ..._rest] = topic.split('/');
 		const html = message.toString('utf8');
 		const [type, mode] = action.split('_');

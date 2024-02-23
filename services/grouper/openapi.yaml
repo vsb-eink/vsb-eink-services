@@ -1,0 +1,279 @@
+openapi: 3.0.0
+info:
+  title: VSB EInk Grouper Service
+  version: 1.0.0
+components:
+  schemas:
+    Group:
+      type: object
+      properties:
+        name:
+          type: string
+        panels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Panel'
+      required:
+        - name
+        - panels
+    Panel:
+      type: string
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        statusCode:
+          type: integer
+      required:
+        - message
+        - error
+        - statusCode
+  parameters:
+    groupName:
+      name: groupName
+      in: path
+      required: true
+      schema:
+        type: string
+    panelName:
+      name: panelName
+      in: path
+      required: true
+      schema:
+        type: string
+paths:
+  /groups:
+    get:
+      summary: Get all panel groups
+      responses:
+        200:
+          description: A list of panel groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+    post:
+      summary: Create a new panel group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        201:
+          description: The newly created panel group
+          content:
+           application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+        409:
+          description: A panel group with the same name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Replace all panel groups
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+               $ref: '#/components/schemas/Group'
+      responses:
+        200:
+          description: The updated list of panel groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+  /groups/{groupName}:
+    get:
+      summary: Get a panel group by name
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+      responses:
+        200:
+          description: A panel group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Update a panel group by name
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        200:
+          description: The updated panel group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Replace a panel group by name
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        200:
+          description: The updated panel group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        204:
+          description: The panel group was successfully created
+    delete:
+        summary: Delete a panel group by name
+        parameters:
+          - $ref: '#/components/parameters/groupName'
+        responses:
+          204:
+            description: The panel group was successfully deleted
+          404:
+            description: A panel group with the specified name does not exist
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /groups/{groupName}/panels:
+    get:
+      summary: Get all panels in a panel group
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+      responses:
+        200:
+          description: A list of panels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Panel'
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Add a panel to a panel group
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Panel'
+      responses:
+        201:
+          description: The newly created panel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Panel'
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Replace all panels in a panel group
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                  $ref: '#/components/schemas/Panel'
+      responses:
+        200:
+          description: The updated list of panels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Panel'
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+  /groups/{groupName}/panels/{panelName}:
+    put:
+      summary: Place a panel in a panel group
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+        - $ref: '#/components/parameters/panelName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Panel'
+      responses:
+        200:
+          description: The panel was already in the group
+        204:
+          description: The panel was successfully placed in the group
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Remove a panel from a panel group
+      parameters:
+        - $ref: '#/components/parameters/groupName'
+        - $ref: '#/components/parameters/panelName'
+      responses:
+        204:
+          description: The panel was successfully removed from the group
+        404:
+          description: A panel group with the specified name does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

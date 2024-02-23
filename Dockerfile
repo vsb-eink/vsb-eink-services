@@ -17,7 +17,8 @@ RUN pnpm deploy --filter=compressor --prod /prod/compressor && \
     pnpm deploy --filter=grouper --prod /prod/grouper && \
     pnpm deploy --filter=renderer --prod /prod/renderer && \
     pnpm deploy --filter=scheduler --prod /prod/scheduler && \
-    pnpm deploy --filter=hoster --prod /prod/hoster
+    pnpm deploy --filter=hoster --prod /prod/hoster && \
+    pnpm deploy --filter=facade --prod /prod/facade
 
 FROM base AS compressor
 WORKDIR /app
@@ -43,5 +44,12 @@ CMD [ "pnpm", "start" ]
 
 FROM base as hoster
 WORKDIR /app
+COPY --from=build /prod/hoster .
+EXPOSE 3000
+CMD [ "pnpm", "start" ]
+
+FROM base AS facade
+WORKDIR /app
+COPY --from=build /prod/facade .
 EXPOSE 3000
 CMD [ "pnpm", "start" ]

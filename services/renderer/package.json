@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/vsb-eink-renderer.js",
+    "dev": "tsx watch src/vsb-eink-renderer.ts",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix"
   },
@@ -20,16 +21,11 @@
   ],
   "prettier": "@vsb-eink/prettier-config",
   "dependencies": {
-    "@fastify/cors": "^8.4.1",
-    "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
+    "dotenv": "^16.4.4",
     "env-var": "^7.4.1",
-    "fastify": "^4.26.0",
-    "fastify-plugin": "^4.5.1",
     "mqtt": "^5.2.2",
     "mqtt-pattern": "^2.1.0",
     "playwright": "^1.41.1",
-    "rss-to-json": "^2.1.1",
-    "sharp": "^0.32.6",
     "winston": "^3.11.0"
   },
   "devDependencies": {
@@ -39,6 +35,7 @@
     "@vsb-eink/tsconfig": "workspace:^",
     "eslint": "^8.56.0",
     "prettier": "^3.1.0",
+    "tsx": "^4.7.1",
     "typescript": "^5.2.2"
   }
 }

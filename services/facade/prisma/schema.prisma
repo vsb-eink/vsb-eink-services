@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/facade-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Scope {
+  HOSTED_READ
+  HOSTED_WRITE
+  PANELS_READ
+  PANELS_WRITE
+  USERS_READ
+  USERS_WRITE
+  SCHEDULE_READ
+  SCHEDULE_WRITE
+}
+
+model User {
+  id       Int         @id @default(autoincrement())
+  username String      @unique
+  password String
+  role     Role        @default(USER)
+  groups   UserGroup[]
+}
+
+model UserGroup {
+  id                 Int          @id @default(autoincrement())
+  name               String       @unique
+  users              User[]
+  scopes             Scope[]
+  managedPanelGroups PanelGroup[]
+}
+
+model Panel {
+  id     String       @id
+  name   String?      @unique
+  groups PanelGroup[]
+}
+
+model PanelGroup {
+  id        String      @id
+  name      String?     @unique
+  panels    Panel[]
+  managedBy UserGroup[]
+}

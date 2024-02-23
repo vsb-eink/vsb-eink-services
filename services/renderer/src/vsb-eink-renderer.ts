@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import 'dotenv/config';
+
 import { Browser, chromium } from 'playwright';
 
 import { logger } from './logger.js';

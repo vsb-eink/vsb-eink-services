@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/scheduler-client"
 }
 
 datasource db {
@@ -8,16 +9,16 @@ datasource db {
 }
 
 model EInkJob {
-  id          Int @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String?
   cron        String
   target      String
   command     String
   commandType String
-  commandArgs String @default("[]")
+  commandArgs String  @default("[]")
   hasSeconds  Boolean @default(false)
-  priority    Int @default(0)
-  cycle       Int @default(0)
+  priority    Int     @default(0)
+  cycle       Int     @default(0)
   shouldCycle Boolean @default(false)
   disabled    Boolean @default(false)
 

@@ -1,0 +1,4 @@
+{
+  "extends": "@vsb-eink/tsconfig",
+  "include": ["*.ts"]
+}

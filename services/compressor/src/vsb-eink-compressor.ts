@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+import 'dotenv/config';
 import sharp from 'sharp';
 import { connectAsync } from 'mqtt';
+
 import { MQTT_URL } from './env.js';
 import {
 	isSupportedMimeType,
@@ -10,7 +12,7 @@ import {
 	SUPPORTED_MODES,
 	toRawInkplate10Buffer,
 } from './graphics/compress.js';
-import {fetchBuffer, fetchMimeType} from './utils/http.js';
+import { fetchBuffer, fetchMimeType } from './utils/http.js';
 
 console.log(`Connecting to MQTT broker at ${MQTT_URL}`);
 const mqtt = await connectAsync(MQTT_URL);
@@ -38,8 +40,12 @@ for (const mode of SUPPORTED_MODES) {
 mqtt.on('message', async (topic, payload) => {
 	console.log(`Received message on ${topic}`);
 
-	const [, target, command, format, ...rest] = topic.split('/');
+	if (payload.length === 0) {
+		console.error('Payload is empty, skipping');
+		return;
+	}
 
+	const [, target, command, format, ...rest] = topic.split('/');
 	const [extension, mode] = format.split('_');
 
 	try {

@@ -1,0 +1,135 @@
+openapi: 3.0.0
+info:
+  title: VSB EInk Hoster Service
+  version: 1.0.0
+components:
+  schemas:
+    Dirent:
+      allOf:
+        - type: object
+          properties:
+            name:
+              type: string
+            path:
+              type: string
+              format: uri-reference
+          required: [name, path]
+        - oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["file"]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["directory"]
+                children:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Dirent"
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        error:
+          type: string
+      required: [statusCode, message, error]
+  requestBodies:
+    FileUpload:
+      required: false
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              file:
+                type: array
+                items:
+                  type: string
+                  format: binary
+  parameters:
+    path:
+      name: path
+      in: path
+      required: false
+      description: Path to a file or directory (can include slashes)
+      schema:
+        type: string
+        format: uri-reference
+    url:
+      name: url
+      in: path
+      required: true
+      description: URL to be proxied
+      schema:
+        type: string
+        format: uri
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+paths:
+  /core/ping:
+    get:
+      summary: Ping the service
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum: ["pong"]
+  /core/files/{path}:
+    get:
+      summary: Get entry's metadata
+      parameters:
+        - $ref: "#/components/parameters/path"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dirent"
+        404:
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Upload files to a directory or create a directory
+      parameters:
+        - $ref: "#/components/parameters/path"
+      requestBody:
+        $ref: "#/components/requestBodies/FileUpload"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dirent"
+        409:
+          $ref: "#/components/responses/Conflict"
+  /core/proxy/{url}:
+  /user/{path}:

@@ -32,7 +32,7 @@ export function createScheduler() {
 	const stopScheduler = async () => {
 		scheduler.clearTimeoutOrInterval(eachMinuteInterval);
 		scheduler.clearTimeoutOrInterval(eachSecondInterval);
-		await pool.close();
+		await pool.destroy();
 	};
 
 	return { scheduler, pool, stopScheduler };

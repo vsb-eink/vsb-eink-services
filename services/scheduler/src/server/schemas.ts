@@ -1,6 +1,4 @@
-import { Omit, TSchema, Type } from '@fastify/type-provider-typebox';
-
-const Nullable = <T extends TSchema>(schema: T) => Type.Union([schema, Type.Null()]);
+import { Type } from '@fastify/type-provider-typebox';
 
 export const HttpErrorSchema = Type.Ref('HttpError');
 
@@ -8,7 +6,7 @@ export const EmptyBodySchema = Type.Null();
 
 export const EInkJobSchema = Type.Object({
 	id: Type.Integer(),
-	name: Nullable(Type.String()),
+	name: Type.Union([Type.String(), Type.Null()]),
 	cron: Type.String(),
 	target: Type.String(),
 	command: Type.String(),
@@ -21,20 +19,23 @@ export const EInkJobSchema = Type.Object({
 	disabled: Type.Boolean(),
 });
 
-export const EInkJobSelectableSchema = Type.Composite([EInkJobSchema]);
+export const EInkJobSelectableSchema = EInkJobSchema;
 
-export const EInkJobUpdatableSchema = Type.Partial(
-	Type.Composite([Type.Omit(EInkJobSchema, ['name']), Type.Object({ name: Type.String() })]),
-);
+export const EInkJobUpdatableSchema = Type.Partial(EInkJobSchema);
 
-export const EInkJobCreatableSchema = Type.Composite([
-	Omit(EInkJobSchema, ['id', 'name']),
-	Type.Object({
-		name: Type.String(),
-		hasSeconds: Type.Partial(Type.Boolean()),
-		priority: Type.Partial(Type.Integer()),
-		disabled: Type.Partial(Type.Boolean()),
-	}),
+export const EInkJobInsertableSchema = Type.Intersect([
+	Type.Pick(EInkJobSchema, ['cron', 'target', 'command', 'commandType']),
+	Type.Partial(
+		Type.Pick(EInkJobSchema, [
+			'name',
+			'commandArgs',
+			'hasSeconds',
+			'priority',
+			'cycle',
+			'shouldCycle',
+			'disabled',
+		]),
+	),
 ]);
 
 export const EInkJobQuerySchema = Type.Partial(

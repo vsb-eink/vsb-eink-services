@@ -28,22 +28,6 @@ export function isHttpUrl(url: string) {
 	return url.startsWith('http://') || url.startsWith('https://');
 }
 
-export function joinUrl(...parts: string[]): string {
-	if (!Array.isArray(parts)) {
-		throw new TypeError(`Expected string arguments`);
-	}
-
-	if (parts.length === 0) {
-		throw new Error(`Expected at least one url part`);
-	}
-
-	const fullUrl = new URL(parts[0]);
-
-	fullUrl.pathname = joinPosixPath(fullUrl.pathname, ...parts.slice(1));
-
-	return fullUrl.toString();
-}
-
 export async function fetchMimeType(url: string) {
 	const response = await fetch(url, { method: 'HEAD' });
 	const contentType = response.headers.get('content-type');

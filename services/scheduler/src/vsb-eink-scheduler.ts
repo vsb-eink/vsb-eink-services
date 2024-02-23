@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import 'dotenv/config';
+
 import { API_HOST, API_PORT } from './environment.js';
 
 import { logger } from './logger.js';
