@@ -58,11 +58,11 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 	});
 
 	/** single user group routes */
-	const UserGroupPathParamsSchema = Type.Object({ id: Type.Number() });
+	const UserGroupPathParamsSchema = Type.Object({ userGroupId: Type.Number() });
 
 	app.route({
 		method: 'GET',
-		url: '/:id',
+		url: '/:userGroupId',
 		schema: {
 			params: UserGroupPathParamsSchema,
 			response: {
@@ -76,7 +76,7 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		]),
 		handler: async (request, reply) => {
 			const group = db.userGroup.findUnique({
-				where: { id: request.params.id },
+				where: { id: request.params.userGroupId },
 				include: { users: true, managedPanelGroups: true },
 			});
 
@@ -90,7 +90,7 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 
 	app.route({
 		method: 'PATCH',
-		url: '/:id',
+		url: '/:userGroupId',
 		schema: {
 			params: UserGroupPathParamsSchema,
 			body: UpdatableUserGroupSchema,
@@ -106,7 +106,7 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		handler: async (request, reply) => {
 			try {
 				return await db.userGroup.update({
-					where: { id: request.params.id },
+					where: { id: request.params.userGroupId },
 					data: {
 						name: request.body.name,
 						scopes: request.body.scopes,
@@ -129,7 +129,7 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 
 	app.route({
 		method: 'DELETE',
-		url: '/:id',
+		url: '/:userGroupId',
 		schema: {
 			params: UserGroupPathParamsSchema,
 			response: {
@@ -143,7 +143,7 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		]),
 		handler: async (request, reply) => {
 			try {
-				await db.userGroup.delete({ where: { id: request.params.id } });
+				await db.userGroup.delete({ where: { id: request.params.userGroupId } });
 				reply.status(204);
 			} catch (error) {
 				if (isNotFoundError(error)) {

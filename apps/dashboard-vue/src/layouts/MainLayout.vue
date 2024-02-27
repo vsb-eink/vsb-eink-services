@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { type RouteLocationNormalized, useRoute, useRouter } from 'vue-router';
+import { type RouteRecordNormalized, useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import type { Scope } from '@/types/scopes';
 
@@ -54,7 +54,7 @@ const logout = () => {
 	router.push('/login');
 };
 
-const canAccess = (route: RouteLocationNormalized) => {
+const canAccess = (route: RouteRecordNormalized) => {
 	if (route.meta.requiresAuth) {
 		return localStorage.getItem('token');
 	}

@@ -1,9 +1,8 @@
-import { sep, join } from 'node:path';
+import { sep, join, dirname } from 'node:path';
 import { mkdir, rename, rm } from 'node:fs/promises';
 
 import { FastifyPluginAsyncTypebox, Type } from '@fastify/type-provider-typebox';
 import FastifyMultiPart from '@fastify/multipart';
-import { TypeCompiler } from '@sinclair/typebox/compiler';
 
 import { USER_CONTENT_PATH } from '../environment.js';
 import {
@@ -39,7 +38,9 @@ const DirentSchema = Type.Recursive(
 );
 
 export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts) {
-	app.register(FastifyMultiPart);
+	// Register the multipart plugin to handle file uploads
+	// Limit the file size to 100MB
+	app.register(FastifyMultiPart, { limits: { fileSize: 100 * 1000 * 1000 } });
 
 	const getFilesOpts = {
 		schema: {
@@ -55,7 +56,7 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 
 		return readPathRecursive(fullPath, {
 			stripRoot: true,
-			pathModifier: (path) => `/user/${path.replaceAll(sep, '/')}`,
+			pathModifier: (path) => `${path.replaceAll(sep, '/')}`,
 		});
 	});
 
@@ -71,8 +72,6 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 		const targetPath = extractWildcardParam(request);
 		const fullPath = join(USER_CONTENT_PATH, targetPath);
 
-		const files = await request.saveRequestFiles();
-
 		if (await isFile(fullPath)) {
 			return reply.conflict('File already exists');
 		}
@@ -81,14 +80,18 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 			await mkdir(fullPath, { recursive: true });
 		}
 
-		for (const file of files) {
-			await rename(file.filepath, join(fullPath, file.filename));
+		if (request.isMultipart()) {
+			const files = await request.saveRequestFiles();
+
+			for (const file of files) {
+				await rename(file.filepath, join(fullPath, file.filename));
+			}
 		}
 
 		reply.statusCode = 201;
 		return readPathRecursive(fullPath, {
 			stripRoot: true,
-			pathModifier: (path) => `/user/${path.replaceAll(sep, '/')}`,
+			pathModifier: (path) => `${path.replaceAll(sep, '/')}`,
 		});
 	});
 
@@ -127,7 +130,7 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 		reply.statusCode = 201;
 		return readPathRecursive(fullPath, {
 			stripRoot: true,
-			pathModifier: (path) => `/user/${path.replaceAll(sep, '/')}`,
+			pathModifier: (path) => `${path.replaceAll(sep, '/')}`,
 		});
 	});
 
@@ -137,6 +140,7 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 			response: {
 				200: DirentSchema,
 				400: HttpErrorSchema,
+				501: HttpErrorSchema,
 			},
 		},
 	} satisfies RouteShorthandOptions;
@@ -144,8 +148,12 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 		const targetPath = extractWildcardParam(request);
 		const fullPath = join(USER_CONTENT_PATH, targetPath);
 
-		const newPath = request.body.name;
-		const newFullPath = join(USER_CONTENT_PATH, newPath);
+		if (!request.body.name) {
+			return reply.notImplemented();
+		}
+
+		const parentPath = dirname(fullPath);
+		const newFullPath = join(parentPath, request.body.name);
 
 		if (!(await pathExists(fullPath))) {
 			return reply.notFound();
@@ -153,9 +161,9 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 
 		await rename(fullPath, newFullPath);
 
-		return readPathRecursive(fullPath, {
+		return readPathRecursive(newFullPath, {
 			stripRoot: true,
-			pathModifier: (path) => `/user/${path.replaceAll(sep, '/')}`,
+			pathModifier: (path) => `${path.replaceAll(sep, '/')}`,
 		});
 	});
 

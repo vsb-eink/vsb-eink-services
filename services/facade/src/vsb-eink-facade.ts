@@ -6,7 +6,7 @@ import { createServer } from './server.js';
 import { API_HOST, API_PORT } from './environment.js';
 import { createSyncWorker } from './sync.js';
 
-const server = createServer();
+const server = createServer({ logger: true });
 const syncWorker = createSyncWorker();
 
 await server.listen({

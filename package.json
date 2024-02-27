@@ -8,5 +8,10 @@
   },
   "keywords": [],
   "author": "Marek Lukas <luk0125@vsb.cz>",
-  "license": "ISC"
+  "license": "ISC",
+  "pnpm": {
+    "patchedDependencies": {
+      "@fastify/auth@4.6.0": "patches/@fastify__auth@4.6.0.patch"
+    }
+  }
 }

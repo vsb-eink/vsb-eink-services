@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: VSB EInk Facade Service
+  version: 1.0.0
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+  responses:
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                enum: [401]
+              error:
+                type: string
+                enum: [Unauthorized]
+              message:
+                type: string
+            required:
+              - statusCode
+              - error
+              - message
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                enum: [403]
+              error:
+                type: string
+                enum: [Forbidden]
+              message:
+                type: string
+            required:
+              - statusCode
+              - error
+              - message
+paths:
+  /auth/login:
+    post:
+      summary: Login
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCredentials'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  /profile:
+  /maintenance/sync:
+  /panels:
+  /panels/{panelId}:
+  /panel-groups:
+  /panel-groups/{panelGroupId}:
+  /users:
+  /users/{userId}:
+  /user-groups/{userGroupId}:
+  /schedule:
+  /schedule/{jobId}:
+  /hosted/core/files:
+  /hosted/core/files/{path}:
+  /hosted/user/{path}:

@@ -1,18 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteLocationNormalized } from 'vue-router';
+import { LocalStorage, Notify, SessionStorage } from 'quasar';
 
-import DashboardView from '../views/DashboardView.vue';
-import BaseLayout from '@/layouts/BaseLayout.vue';
+import DashboardView from '@/views/DashboardView.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 import { Scope } from '@/types/scopes';
 import { http } from '@/services/http';
-import { LocalStorage, Notify, SessionStorage } from 'quasar';
 
 export const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
 		{
 			path: '/',
-			component: BaseLayout,
+			component: MainLayout,
 			children: [
 				{
 					path: '/',
@@ -35,16 +35,6 @@ export const router = createRouter({
 					component: () => import('@/views/FilesView.vue'),
 				},
 				{
-					path: '/panels',
-					name: 'panels',
-					meta: {
-						title: 'Panely',
-						inDrawer: true,
-						requiresScopes: [Scope.PANELS_READ],
-					},
-					component: () => import('@/views/PanelsView.vue'),
-				},
-				{
 					path: '/schedule',
 					name: 'schedule',
 					meta: {
@@ -55,24 +45,104 @@ export const router = createRouter({
 					component: () => import('@/views/ScheduleView.vue'),
 				},
 				{
+					path: '/panels',
+					children: [
+						{
+							path: '',
+							name: 'panels',
+							meta: {
+								title: 'Panely',
+								inDrawer: true,
+								requiresScopes: [Scope.PANELS_READ],
+							},
+							component: () => import('@/views/panels/PanelListView.vue'),
+						},
+						{
+							path: ':id',
+							name: 'panel-detail',
+							meta: {
+								title: 'Detail panelu',
+								inDrawer: false,
+								requiresScopes: [Scope.PANELS_READ],
+							},
+							component: () => import('@/views/panels/PanelDetailView.vue'),
+						},
+					],
+				},
+				{
+					path: '/panel-groups',
+					children: [
+						{
+							path: '',
+							name: 'panel-groups',
+							meta: {
+								title: 'Skupiny panelů',
+								inDrawer: true,
+								requiresScopes: [Scope.PANELS_READ],
+							},
+							component: () => import('@/views/panels/PanelGroupListView.vue'),
+						},
+						{
+							path: ':id',
+							name: 'panel-group-detail',
+							meta: {
+								title: 'Detail skupiny panelů',
+								inDrawer: false,
+								requiresScopes: [Scope.PANELS_READ],
+							},
+							component: () => import('@/views/panels/PanelGroupDetailView.vue'),
+						},
+					],
+				},
+				{
 					path: '/users',
-					name: 'users',
-					meta: {
-						title: 'Uživatelé',
-						inDrawer: true,
-						requiresScopes: [Scope.USERS_READ],
-					},
-					component: () => import('@/views/UsersView.vue'),
+					children: [
+						{
+							path: '',
+							name: 'users',
+							meta: {
+								title: 'Uživatelé',
+								inDrawer: true,
+								requiresScopes: [Scope.USERS_READ],
+							},
+							component: () => import('@/views/users/UserListView.vue'),
+						},
+						{
+							path: ':id',
+							name: 'user-detail',
+							meta: {
+								title: 'Detail uživatele',
+								inDrawer: false,
+								requiresScopes: [Scope.USERS_READ],
+							},
+							component: () => import('@/views/users/UserDetailView.vue'),
+						},
+					],
 				},
 				{
 					path: '/user-groups',
-					name: 'user-groups',
-					meta: {
-						title: 'Skupiny uživatelů',
-						inDrawer: true,
-						requiresScopes: [Scope.USERS_READ],
-					},
-					component: () => import('@/views/UserGroupsView.vue'),
+					children: [
+						{
+							path: '',
+							name: 'user-groups',
+							meta: {
+								title: 'Skupiny uživatelů',
+								inDrawer: true,
+								requiresScopes: [Scope.USERS_READ],
+							},
+							component: () => import('@/views/users/UserGroupListView.vue'),
+						},
+						{
+							path: ':id',
+							name: 'user-group-detail',
+							meta: {
+								title: 'Detail skupiny uživatelů',
+								inDrawer: false,
+								requiresScopes: [Scope.USERS_READ],
+							},
+							component: () => import('@/views/users/UserGroupDetailView.vue'),
+						},
+					],
 				},
 				{
 					path: '/settings',

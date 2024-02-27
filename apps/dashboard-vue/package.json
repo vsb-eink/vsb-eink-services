@@ -15,11 +15,13 @@
   "dependencies": {
     "@quasar/extras": "^1.16.9",
     "@vsb-eink/prettier-config": "workspace:^",
+    "@vueuse/core": "^10.8.0",
     "axios": "^1.6.7",
+    "env-var": "^7.4.1",
     "pinia": "^2.1.7",
     "quasar": "^2.14.4",
     "vue": "^3.4.15",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@quasar/vite-plugin": "^1.6.0",

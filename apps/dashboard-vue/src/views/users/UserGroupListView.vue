@@ -5,29 +5,12 @@
 			:loading="userGroupsLoading"
 			:columns="userGroupsColumns"
 			:rows="userGroups"
+			@rowClick="onRowClick"
 		>
-			<template v-slot:body="props">
-				<q-tr :props="props">
-					<q-td key="id" :props="props">
-						{{ props.row.id }}
-					</q-td>
-
-					<q-td key="name" :props="props">
-						{{ props.row.name }}
-					</q-td>
-
-					<q-td key="panel-groups" :props="props">
-						<q-chip v-bind:key="group.id" v-for="group in props.row.panelGroups">
-							{{ group.name }}
-						</q-chip>
-					</q-td>
-
-					<q-td key="scopes" :props="props">
-						<q-chip v-bind:key="scope" v-for="scope in props.row.scopes">
-							{{ scope }}
-						</q-chip>
-					</q-td>
-				</q-tr>
+			<template v-slot:body-cell-scopes="props">
+				<q-td key="scopes" :props="props">
+					<ScopeBadges :scopes="props.row.scopes" />
+				</q-td>
 			</template>
 		</q-table>
 	</q-page>
@@ -35,7 +18,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { http } from '@/services/http';
+import ScopeBadges from '@/components/ScopeBadges.vue';
+
+const router = useRouter();
 
 const userGroupsLoading = ref(true);
 const userGroups = ref([]);
@@ -53,12 +40,6 @@ const userGroupsColumns = [
 		field: 'name',
 	},
 	{
-		name: 'panel-groups',
-		label: 'Skupiny panelů',
-		align: 'left',
-		field: 'panelGroups',
-	},
-	{
 		name: 'scopes',
 		label: 'Oprávnění',
 		align: 'left',
@@ -71,6 +52,10 @@ onMounted(async () => {
 	userGroups.value = resGroups.data;
 	userGroupsLoading.value = false;
 });
+
+const onRowClick = (event, userGroup) => {
+	router.push({ name: 'user-group-detail', params: { id: userGroup.id } });
+};
 </script>
 
 <style scoped></style>

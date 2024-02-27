@@ -1,23 +1,12 @@
-import { Static, TSchema, Type } from '@fastify/type-provider-typebox';
+import { Type } from '@fastify/type-provider-typebox';
 import { Role, Scope } from './database.js';
-
-export const Nullable = <T extends TSchema>(schema: T) =>
-	Type.Unsafe<Static<T> | null>({
-		...schema,
-		nullable: true,
-	});
 
 export const EmptyBodySchema = Type.Null();
 export const HttpErrorSchema = Type.Ref('HttpError');
 
 export const GenericObjectWithStringIdAndOptionalName = Type.Object({
 	id: Type.String(),
-	name: Type.Optional(Nullable(Type.String())),
-});
-
-export const GenericObjectWithStringIdAndNullableName = Type.Object({
-	id: Type.String(),
-	name: Nullable(Type.String()),
+	name: Type.Optional(Type.String()),
 });
 
 export const GenericObjectWithNumericIdAndOptionalName = Type.Object({
@@ -27,6 +16,11 @@ export const GenericObjectWithNumericIdAndOptionalName = Type.Object({
 
 export const GenericObjectWithNumericIdAndName = Type.Object({
 	id: Type.Number(),
+	name: Type.String(),
+});
+
+export const GenericObjectWithStringIdAndName = Type.Object({
+	id: Type.String(),
 	name: Type.String(),
 });
 
@@ -50,9 +44,9 @@ export const InsertableUserSchema = Type.Object({
 export const UpdatableUserSchema = Type.Partial(InsertableUserSchema);
 
 export const PanelGroupSchema = Type.Intersect([
-	GenericObjectWithStringIdAndNullableName,
+	GenericObjectWithStringIdAndName,
 	Type.Object({
-		panels: Type.Array(GenericObjectWithStringIdAndNullableName),
+		panels: Type.Array(GenericObjectWithStringIdAndName),
 		managedBy: Type.Array(GenericObjectWithNumericIdAndName),
 	}),
 ]);
@@ -68,16 +62,16 @@ export const InsertablePanelGroupSchema = Type.Intersect([
 export const UpdatablePanelGroupSchema = Type.Partial(InsertablePanelGroupSchema);
 
 export const PanelSchema = Type.Intersect([
-	GenericObjectWithStringIdAndNullableName,
+	GenericObjectWithStringIdAndName,
 	Type.Object({
-		groups: Type.Array(GenericObjectWithStringIdAndNullableName),
+		groups: Type.Array(GenericObjectWithStringIdAndName),
 	}),
 ]);
 
 export const InsertablePanelSchema = Type.Intersect([
 	GenericObjectWithStringIdAndOptionalName,
 	Type.Object({
-		groups: Type.Array(GenericObjectWithStringIdAndOptionalName),
+		groups: Type.Optional(Type.Array(GenericObjectWithStringIdAndOptionalName)),
 	}),
 ]);
 
@@ -88,7 +82,7 @@ export const UserGroupSchema = Type.Object({
 	name: Type.String(),
 	scopes: Type.Array(ScopeSchema),
 	users: Type.Array(Type.Omit(UserSchema, ['groups'])),
-	managedPanelGroups: Type.Array(GenericObjectWithStringIdAndNullableName),
+	managedPanelGroups: Type.Array(GenericObjectWithStringIdAndName),
 });
 
 export const InsertableUserGroupSchema = Type.Object({

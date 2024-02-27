@@ -60,11 +60,11 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 	});
 
 	/** single user routes */
-	const UserPathParamsSchema = Type.Object({ id: Type.Number() });
+	const UserPathParamsSchema = Type.Object({ userId: Type.Number() });
 
 	app.route({
 		method: 'GET',
-		url: '/:id',
+		url: '/:userId',
 		schema: {
 			params: UserPathParamsSchema,
 			response: {
@@ -79,7 +79,7 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		]),
 		handler: async (request, reply) => {
 			const user = db.user.findUnique({
-				where: { id: request.params.id },
+				where: { id: request.params.userId },
 				include: { groups: true },
 			});
 			if (!user) {
@@ -91,7 +91,7 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 
 	app.route({
 		method: 'PATCH',
-		url: '/:id',
+		url: '/:userId',
 		schema: {
 			params: UserPathParamsSchema,
 			body: UpdatableUserSchema,
@@ -120,7 +120,7 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 					: undefined;
 
 				return await db.user.update({
-					where: { id: request.params.id },
+					where: { id: request.params.userId },
 					data: {
 						username: request.body.username,
 						role: request.body.role,
@@ -140,7 +140,7 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 
 	app.route({
 		method: 'DELETE',
-		url: '/:id',
+		url: '/:userId',
 		schema: {
 			params: UserPathParamsSchema,
 			response: {
@@ -155,7 +155,7 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		]),
 		handler: async (request, reply) => {
 			try {
-				await db.user.delete({ where: { id: request.params.id } });
+				await db.user.delete({ where: { id: request.params.userId } });
 				reply.status(204);
 			} catch (error) {
 				if (isNotFoundError(error)) {

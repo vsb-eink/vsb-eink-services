@@ -5,7 +5,11 @@ const prisma = new PrismaClient();
 
 await prisma.$transaction(async (tx) => {
 	await tx.panelGroup.createMany({
-		data: [{ id: 'debug' }, { id: 'all' }, { id: 'ec', name: 'EC1, EC2, EC3' }],
+		data: [
+			{ id: 'debug', name: 'Debugovací' },
+			{ id: 'all', name: 'Všechny panely' },
+			{ id: 'ec', name: 'EC1, EC2, EC3' },
+		],
 	});
 
 	await tx.userGroup.create({

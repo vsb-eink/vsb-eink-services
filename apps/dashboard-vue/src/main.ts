@@ -2,7 +2,7 @@ import './assets/main.css';
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { LocalStorage, Meta, Notify, Quasar, SessionStorage } from 'quasar';
+import { Dialog, LocalStorage, Meta, Notify, Quasar, Ripple, SessionStorage } from 'quasar';
 import quasarCzechLocale from 'quasar/lang/cs';
 
 // fonts
@@ -16,11 +16,13 @@ import { router } from './router';
 
 const app = createApp(App);
 
-app.use(createPinia());
 app.use(Quasar, {
 	lang: quasarCzechLocale,
-	plugins: { Notify, Meta, SessionStorage, LocalStorage },
+	plugins: { Notify, Meta, SessionStorage, LocalStorage, Dialog },
 });
+app.directive('ripple', Ripple);
+
+app.use(createPinia());
 app.use(router);
 
 app.mount('#app');

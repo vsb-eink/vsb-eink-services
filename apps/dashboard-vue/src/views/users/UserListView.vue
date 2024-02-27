@@ -1,26 +1,19 @@
 <template>
 	<q-page padding>
-		<q-table title="Uživatelé" :loading="usersLoading" :columns="usersColumns" :rows="users">
-			<template v-slot:body="props">
-				<q-tr :props="props">
-					<q-td key="id" :props="props">
-						{{ props.row.id }}
-					</q-td>
-
-					<q-td key="username" :props="props">
-						{{ props.row.username }}
-					</q-td>
-
-					<q-td key="role" :props="props">
-						{{ props.row.role }}
-					</q-td>
-
-					<q-td key="groups" :props="props">
-						<q-chip v-bind:key="group.id" v-for="group in props.row.groups">
-							{{ group.name }}
-						</q-chip>
-					</q-td>
-				</q-tr>
+		<q-table
+			title="Uživatelé"
+			:loading="usersLoading"
+			:columns="usersColumns"
+			:rows="users"
+			:grid="$q.screen.xs"
+			@rowClick="onRowClick"
+		>
+			<template v-slot:body-cell-groups="props">
+				<q-td key="groups" :props="props">
+					<q-chip v-bind:key="group.id" v-for="group in props.row.groups">
+						{{ group.name }}
+					</q-chip>
+				</q-td>
 			</template>
 		</q-table>
 	</q-page>
@@ -29,6 +22,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { http } from '@/services/http';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const usersLoading = ref(true);
 const users = ref([]);
@@ -53,7 +49,7 @@ const usersColumns = [
 	},
 	{
 		name: 'groups',
-		label: 'Skupiny',
+		label: 'Už. skupiny',
 		align: 'left',
 		field: 'groups',
 		format(groups: { name: string }[]) {
@@ -67,6 +63,10 @@ onMounted(async () => {
 	users.value = res.data;
 	usersLoading.value = false;
 });
+
+const onRowClick = (event, user) => {
+	router.push({ name: 'user-detail', params: { id: user.id } });
+};
 </script>
 
 <style scoped></style>

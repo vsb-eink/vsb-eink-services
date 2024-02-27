@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { Notify } from 'quasar';
+import { FACADE_URL } from '@/environment';
 
 export const http = axios.create({
-	baseURL: 'http://localhost:3000',
+	baseURL: FACADE_URL,
 });
 
 http.interceptors.request.use((config) => {

@@ -1,0 +1,13 @@
+diff --git a/auth.js b/auth.js
+index 6f07711a8537158f41723934abe36321c21dffa6..638641cc97983f07d3892f5ef8878562f40e6f4a 100644
+--- a/auth.js
++++ b/auth.js
+@@ -140,7 +140,7 @@ function auth (pluginOptions) {
+               } else {
+                 if (!err && that.options.run !== 'all') {
+                   that.currentError = null
+-                  that.completeAuth()
++                  return that.completeAuth()
+                 }
+                 that.nextAuth(err)
+               }

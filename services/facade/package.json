@@ -23,9 +23,13 @@
   "dependencies": {
     "@fastify/auth": "^4.6.0",
     "@fastify/cors": "^8.4.1",
+    "@fastify/http-proxy": "^9.4.0",
     "@fastify/jwt": "^8.0.0",
+    "@fastify/multipart": "^8.1.0",
     "@fastify/reply-from": "^9.7.0",
     "@fastify/sensible": "^5.5.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
     "@fastify/type-provider-typebox": "^4.0.0",
     "@prisma/client": "^5.9.1",
     "@sinclair/typebox": "^0.32.14",

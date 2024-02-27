@@ -1,0 +1,21 @@
+meta {
+  name: Patch panel
+  type: http
+  seq: 13
+}
+
+patch {
+  url: {{baseUrl}}/panels/ec2
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzA4OTQ5NTM1LCJleHAiOjE3MTE1NDE1MzV9.uSAjL7c-Xuv8MfzXjBOvLakfVi4OjVBgLTqg9zc8-n0
+}
+
+body:json {
+  {
+    "name": "EC2"
+  }
+}

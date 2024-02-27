@@ -5,7 +5,7 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/panel-groups/debug
+  url: {{baseUrl}}/panel-groups/ec
   body: json
   auth: bearer
 }
@@ -16,6 +16,6 @@ auth:bearer {
 
 body:json {
   {
-    "name": "Testovací"
+    "panels": [{"id": "ec1"}, {"id": "ec2"}, {"id": "ec3"}]
   }
 }

@@ -1,8 +1,5 @@
-import { FastifyPluginAsyncTypebox, Static, Type } from '@fastify/type-provider-typebox';
-import FastifyReplyFrom from '@fastify/reply-from';
+import { FastifyPluginAsyncTypebox, Type } from '@fastify/type-provider-typebox';
 
-import { joinUrl } from '../utils.js';
-import { GROUPER_URL } from '../environment.js';
 import { verifyJWT } from '../guards/jwt.js';
 import {
 	EmptyBodySchema,
@@ -67,7 +64,7 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 			return db.panelGroup.create({
 				data: {
 					id: request.body.id,
-					name: request.body.name,
+					name: request.body.name ?? request.body.id,
 					panels: { connect: request.body.panels?.map(({ id }) => ({ id })) },
 					managedBy: { connect: request.body.managedBy?.map(({ id }) => ({ id })) },
 				},
@@ -76,10 +73,10 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		},
 	});
 
-	const PanelGroupParams = Type.Object({ id: Type.String() });
+	const PanelGroupParams = Type.Object({ panelGroupId: Type.String() });
 
 	app.route({
-		url: '/:id',
+		url: '/:panelGroupId',
 		method: 'GET',
 		schema: {
 			params: PanelGroupParams,
@@ -94,7 +91,7 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		]),
 		handler: async (request, reply) => {
 			const group = db.panelGroup.findUnique({
-				where: { id: request.params.id },
+				where: { id: request.params.panelGroupId },
 				include: { panels: true, managedBy: true },
 			});
 
@@ -107,7 +104,7 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 	});
 
 	app.route({
-		url: '/:id',
+		url: '/:panelGroupId',
 		method: 'PATCH',
 		schema: {
 			body: UpdatablePanelGroupSchema,
@@ -132,7 +129,7 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 				}
 
 				const group = await db.panelGroup.update({
-					where: { id: request.params.id },
+					where: { id: request.params.panelGroupId },
 					data: {
 						id: request.body.id,
 						name: request.body.name,
@@ -153,7 +150,7 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 	});
 
 	app.route({
-		url: '/:id',
+		url: '/:panelGroupId',
 		method: 'DELETE',
 		schema: {
 			params: PanelGroupParams,
@@ -168,7 +165,7 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		]),
 		handler: async (request, reply) => {
 			try {
-				await db.panelGroup.delete({ where: { id: request.params.id } });
+				await db.panelGroup.delete({ where: { id: request.params.panelGroupId } });
 			} catch (error) {
 				if (isNotFoundError(error)) {
 					return reply.notFound();

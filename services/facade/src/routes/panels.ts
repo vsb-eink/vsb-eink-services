@@ -59,7 +59,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			return db.panel.create({
 				data: {
 					id: request.body.id,
-					name: request.body.name,
+					name: request.body.name ?? request.body.id,
 					groups: { connect: request.body.groups?.map(({ id }) => ({ id })) },
 				},
 				include: { groups: true },
@@ -67,9 +67,9 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		},
 	});
 
-	const PanelPathParamsSchema = Type.Object({ id: Type.String() });
+	const PanelPathParamsSchema = Type.Object({ panelId: Type.String() });
 	app.route({
-		url: '/:id',
+		url: '/:panelId',
 		method: 'GET',
 		schema: {
 			params: PanelPathParamsSchema,
@@ -84,7 +84,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		]),
 		handler: async (request, reply) => {
 			const panel = db.panel.findUnique({
-				where: { id: request.params.id },
+				where: { id: request.params.panelId },
 				include: { groups: true },
 			});
 
@@ -97,7 +97,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 	});
 
 	app.route({
-		url: '/:id',
+		url: '/:panelId',
 		method: 'PATCH',
 		schema: {
 			params: PanelPathParamsSchema,
@@ -110,7 +110,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		handler: async (request, reply) => {
 			try {
 				const panel = db.panel.update({
-					where: { id: request.params.id },
+					where: { id: request.params.panelId },
 					data: {
 						id: request.body.id,
 						name: request.body.name,
@@ -130,7 +130,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 	});
 
 	app.route({
-		url: '/:id',
+		url: '/:panelId',
 		method: 'DELETE',
 		schema: {
 			params: PanelPathParamsSchema,
@@ -142,7 +142,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		]),
 		handler: async (request, reply) => {
 			try {
-				await db.panel.delete({ where: { id: request.params.id } });
+				await db.panel.delete({ where: { id: request.params.panelId } });
 			} catch (error) {
 				if (isNotFoundError(error)) {
 					return reply.notFound();

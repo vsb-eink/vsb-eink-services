@@ -48,11 +48,11 @@ export const scheduleRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 	});
 
 	/** single job routes */
-	const JobPathParamsSchema = Type.Object({ id: Type.String() });
+	const JobPathParamsSchema = Type.Object({ jobId: Type.String() });
 
 	app.route({
 		method: 'GET',
-		url: '/:id',
+		url: '/:jobId',
 		schema: {
 			params: JobPathParamsSchema,
 		},
@@ -61,13 +61,13 @@ export const scheduleRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			[verifyJWT, verifyScope(Scope.SCHEDULE_READ)],
 		]),
 		handler: async (request, reply) => {
-			return reply.from(joinUrl(SCHEDULER_URL, '/jobs', request.params.id));
+			return reply.from(joinUrl(SCHEDULER_URL, '/jobs', request.params.jobId));
 		},
 	});
 
 	app.route({
 		method: 'PATCH',
-		url: '/:id',
+		url: '/:jobId',
 		schema: {
 			params: JobPathParamsSchema,
 		},
@@ -76,13 +76,13 @@ export const scheduleRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			[verifyJWT, verifyScope(Scope.SCHEDULE_WRITE)],
 		]),
 		handler: async (request, reply) => {
-			return reply.from(joinUrl(SCHEDULER_URL, '/jobs', request.params.id));
+			return reply.from(joinUrl(SCHEDULER_URL, '/jobs', request.params.jobId));
 		},
 	});
 
 	app.route({
 		method: 'DELETE',
-		url: '/:id',
+		url: '/:jobId',
 		schema: {
 			params: JobPathParamsSchema,
 		},
@@ -91,7 +91,7 @@ export const scheduleRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			[verifyJWT, verifyScope(Scope.SCHEDULE_WRITE)],
 		]),
 		handler: async (request, reply) => {
-			return reply.from(joinUrl(SCHEDULER_URL, '/jobs', request.params.id));
+			return reply.from(joinUrl(SCHEDULER_URL, '/jobs', request.params.jobId));
 		},
 	});
 };

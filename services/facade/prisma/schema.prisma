@@ -42,13 +42,13 @@ model UserGroup {
 
 model Panel {
   id     String       @id
-  name   String?      @unique
+  name   String       @unique
   groups PanelGroup[]
 }
 
 model PanelGroup {
   id        String      @id
-  name      String?     @unique
+  name      String      @unique
   panels    Panel[]
   managedBy UserGroup[]
 }
