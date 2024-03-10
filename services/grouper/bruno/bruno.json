@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "@vsb-eink/grouper",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

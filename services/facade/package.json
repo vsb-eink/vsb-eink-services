@@ -1,0 +1,58 @@
+{
+  "name": "@vsb-eink/facade",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "src/vsb-eink-facade.ts",
+  "scripts": {
+    "start": "node dist/vsb-eink-facade.js",
+    "dev": "tsx watch src/vsb-eink-facade.ts",
+    "generate": "tsx scripts/generate-schemas.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "prisma": {
+    "seed": "tsx prisma/dev-seed.ts"
+  },
+  "prettier": "@vsb-eink/prettier-config",
+  "dependencies": {
+    "@fastify/auth": "^4.6.1",
+    "@fastify/cors": "^8.4.1",
+    "@fastify/http-proxy": "^9.4.0",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/multipart": "^8.1.0",
+    "@fastify/reply-from": "^9.7.0",
+    "@fastify/sensible": "^5.5.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
+    "@fastify/type-provider-typebox": "^4.0.0",
+    "@prisma/client": "^5.9.1",
+    "@sinclair/typebox": "^0.32.14",
+    "argon2": "^0.31.2",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.4",
+    "env-var": "^7.4.1",
+    "fastify": "^4.26.0",
+    "fastify-guard": "^2.0.0",
+    "mqtt": "^5.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@vsb-eink/eslint-config": "workspace:^",
+    "@vsb-eink/prettier-config": "workspace:^",
+    "@vsb-eink/tsconfig": "workspace:^",
+    "fix-esm-import-path": "^1.5.0",
+    "openapi-ts-json-schema": "^0.8.0",
+    "prettier": "^3.2.5",
+    "prisma": "^5.9.1",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "yaml": "^2.4.0"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "@vsb-eink/renderer",
+  "version": "1.1.1",
+  "description": "",
+  "bin": "./dist/vsb-eink-renderer.js",
+  "main": "./src/vsb-eink-renderer.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/vsb-eink-renderer.js",
+    "dev": "tsx watch src/vsb-eink-renderer.ts",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist",
+    "README"
+  ],
+  "prettier": "@vsb-eink/prettier-config",
+  "dependencies": {
+    "dotenv": "^16.4.4",
+    "env-var": "^7.4.1",
+    "mqtt": "^5.2.2",
+    "mqtt-pattern": "^2.1.0",
+    "playwright": "^1.41.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.6",
+    "@vsb-eink/eslint-config": "workspace:^",
+    "@vsb-eink/prettier-config": "workspace:^",
+    "@vsb-eink/tsconfig": "workspace:^",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.2.2"
+  }
+}

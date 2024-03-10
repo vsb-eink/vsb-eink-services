@@ -1,0 +1,29 @@
+meta {
+  name: Replace all groups
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/groups
+  body: json
+  auth: none
+}
+
+body:json {
+  [
+    {
+      "id": "all",
+      "name": null,
+      "panels": [
+        {
+          "id": "ec1"
+        },
+        {
+          "id": "luk0125_debug"
+        }
+      ],
+      "name": null
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/scheduler-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model EInkJob {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  cron        String
+  target      String
+  command     String
+  content     String  @default("[]")
+  precise     Boolean @default(false)
+  priority    Int     @default(0)
+  cycle       Int     @default(0)
+  shouldCycle Boolean @default(false)
+  disabled    Boolean @default(false)
+
+  @@unique([target, cron])
+}

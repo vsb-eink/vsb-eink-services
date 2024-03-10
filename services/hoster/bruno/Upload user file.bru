@@ -1,0 +1,15 @@
+meta {
+  name: Upload user file
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/core/files
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  : @file(C:\Users\marek\GitHub\vsb-eink-scheduler\examples\all.cron)
+}

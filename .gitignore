@@ -1,0 +1,11 @@
+# IDE
+.idea/
+
+# dependencies
+node_modules/
+
+# SQLite database files
+*.db
+
+# Environment variables
+.env

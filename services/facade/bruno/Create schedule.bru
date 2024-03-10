@@ -1,0 +1,21 @@
+meta {
+  name: Create schedule
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/schedule
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "cron": "*/1 * * * * *",
+    "target": "debug",
+    "command": "display",
+    "commandType": "url_4bpp",
+    "hasSeconds": true
+  }
+}
