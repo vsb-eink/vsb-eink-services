@@ -8,6 +8,8 @@ import FastifySwagger from '@fastify/swagger';
 import FastifySwaggerUI from '@fastify/swagger-ui';
 
 import { routes } from './routes/index.js';
+import { registerCustomSchemas } from './schemas.js';
+import { JWT_SECRET } from './environment.js';
 
 export function createServer(opts?: FastifyServerOptions) {
 	const app = Fastify(opts);
@@ -15,7 +17,7 @@ export function createServer(opts?: FastifyServerOptions) {
 	app.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 
 	app.register(FastifyGuard.default);
-	app.register(FastifyJWT, { secret: 'hunter2' });
+	app.register(FastifyJWT, { secret: JWT_SECRET });
 	app.register(FastifyAuth);
 
 	app.register(FastifyCors);
@@ -29,9 +31,10 @@ export function createServer(opts?: FastifyServerOptions) {
 		},
 	});
 	app.register(FastifySwaggerUI, {
-		routePrefix: '/docs',
+		routePrefix: '/openapi',
 	});
 
+	registerCustomSchemas(app);
 	app.register(routes, { prefix: '/' });
 
 	return app;

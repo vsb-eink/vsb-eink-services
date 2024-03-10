@@ -33,6 +33,8 @@
   },
   "dependencies": {
     "@fastify/sensible": "^5.5.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
     "@fastify/type-provider-typebox": "^3.5.0",
     "@prisma/client": "^5.9.1",
     "cron-schedule": "^4.0.0",

@@ -13,7 +13,12 @@ export const profileRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 					id: request.user.id,
 				},
 				include: {
-					groups: true,
+					groups: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
 				},
 			});
 

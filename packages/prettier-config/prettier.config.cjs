@@ -6,7 +6,7 @@ const config = {
 	printWidth: 100,
 	overrides: [
 		{
-			files: '*.json',
+			files: ['*.json', '*.yaml', '*.yml'],
 			options: {
 				useTabs: false,
 				tabWidth: 2,

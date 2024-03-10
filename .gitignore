@@ -6,3 +6,6 @@ node_modules/
 
 # SQLite database files
 *.db
+
+# Environment variables
+.env

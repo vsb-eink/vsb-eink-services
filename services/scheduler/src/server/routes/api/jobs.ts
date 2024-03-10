@@ -2,13 +2,14 @@ import { FastifyPluginAsyncTypebox, Type } from '@fastify/type-provider-typebox'
 import { RouteShorthandOptions } from 'fastify';
 
 import {
+	EInkJobBulkUpdatableSchema,
 	EInkJobInsertableSchema,
 	EInkJobQuerySchema,
 	EInkJobSelectableSchema,
-	EInkJobUpdatableSchema,
 	EmptyBodySchema,
 } from '../../schemas.js';
-import { db, Prisma } from '../../../database.js';
+import { db } from '../../../database.js';
+import { isValidCron, isValidCronWithSeconds } from '../../../cron-utils.js';
 
 export const jobsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 	const getJobsOpts = {
@@ -26,7 +27,7 @@ export const jobsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 
 		return jobs.map((job) => ({
 			...job,
-			commandArgs: JSON.parse(job.commandArgs),
+			content: JSON.parse(job.content),
 		}));
 	});
 
@@ -38,14 +39,24 @@ export const jobsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 			},
 		},
 	} satisfies RouteShorthandOptions;
-	app.post('/', createJobOpts, async (req) => {
+	app.post('/', createJobOpts, async (req, reply) => {
+		if (req.body.cron && !isValidCron(req.body.cron)) {
+			return reply.badRequest('Invalid cron expression');
+		}
+
 		const job = await db.eInkJob.create({
-			data: { ...req.body, commandArgs: JSON.stringify(req.body.commandArgs) },
+			data: {
+				...req.body,
+				precise: isValidCronWithSeconds(req.body.cron),
+				content: JSON.stringify(req.body.content),
+			},
 		});
+
+		reply.statusCode = 201;
 
 		return {
 			...job,
-			commandArgs: JSON.parse(job.commandArgs),
+			content: JSON.parse(job.content),
 		};
 	});
 
@@ -55,50 +66,37 @@ export const jobsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 				204: EmptyBodySchema,
 			},
 			querystring: Type.Object({
-				ids: Type.Optional(Type.Array(Type.Integer())),
+				ids: Type.Array(Type.Integer()),
 			}),
 		},
 	} satisfies RouteShorthandOptions;
 	app.delete('/', deleteJobsOpts, async (req, reply) => {
 		const { ids } = req.query;
-
-		if (ids === undefined) {
-			return reply.badRequest();
-		}
-
 		await db.eInkJob.deleteMany({ where: { id: { in: ids } } });
 	});
 
 	const updateJobsOpts = {
 		schema: {
-			body: Type.Array(EInkJobUpdatableSchema),
+			body: EInkJobBulkUpdatableSchema,
 			response: {
 				204: EmptyBodySchema,
 			},
 		},
 	} satisfies RouteShorthandOptions;
-	app.patch('/', updateJobsOpts, async (req) => {
+	app.patch('/', updateJobsOpts, async (req, reply) => {
 		await db.$transaction(async (tx) => {
 			for (const job of req.body) {
-				const data: Prisma.EInkJobUpdateInput = {};
-
-				if (job.name !== undefined) data.name = job.name;
-				if (job.cron !== undefined) data.cron = job.cron;
-				if (job.target !== undefined) data.target = job.target;
-				if (job.command !== undefined) data.command = job.command;
-				if (job.commandType !== undefined) data.commandType = job.commandType;
-				if (job.commandArgs !== undefined) {
-					data.commandArgs = JSON.stringify(job.commandArgs);
+				if (job.cron !== undefined && !isValidCron(job.cron)) {
+					throw reply.badRequest('Invalid cron expression');
 				}
-				if (job.hasSeconds !== undefined) data.hasSeconds = job.hasSeconds;
-				if (job.priority !== undefined) data.priority = job.priority;
-				if (job.cycle !== undefined) data.cycle = job.cycle;
-				if (job.shouldCycle !== undefined) data.shouldCycle = job.shouldCycle;
-				if (job.disabled !== undefined) data.disabled = job.disabled;
 
 				await tx.eInkJob.update({
 					where: { id: job.id },
-					data,
+					data: {
+						...job,
+						content: job.content ? JSON.stringify(job.content) : undefined,
+						precise: job.cron ? isValidCronWithSeconds(job.cron) : undefined,
+					},
 				});
 			}
 		});

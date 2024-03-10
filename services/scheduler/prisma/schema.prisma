@@ -10,13 +10,13 @@ datasource db {
 
 model EInkJob {
   id          Int     @id @default(autoincrement())
-  name        String?
+  name        String
+  description String?
   cron        String
   target      String
   command     String
-  commandType String
-  commandArgs String  @default("[]")
-  hasSeconds  Boolean @default(false)
+  content     String  @default("[]")
+  precise     Boolean @default(false)
   priority    Int     @default(0)
   cycle       Int     @default(0)
   shouldCycle Boolean @default(false)

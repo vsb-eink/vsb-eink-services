@@ -1,12 +1,12 @@
 <template>
 	<q-layout>
 		<q-header elevated>
-			<q-toolbar>
+			<q-toolbar class="bg-secondary">
 				<q-btn flat dense round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
 
 				<q-toolbar-title>VŠB EInk</q-toolbar-title>
 
-				<q-btn flat @click="logout">
+				<q-btn flat @click="logoutAndRedirectToLogin">
 					<q-icon name="logout" />
 					Odhlásit se
 				</q-btn>
@@ -21,6 +21,7 @@
 					clickable
 					tag="router-link"
 					:to="route.path"
+					active-class="active-link"
 					exact
 				>
 					<q-item-section>
@@ -38,30 +39,34 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { type RouteRecordNormalized, useRoute, useRouter } from 'vue-router';
-import { useQuasar } from 'quasar';
-import type { Scope } from '@/types/scopes';
+import { type RouteRecordNormalized, useRouter } from 'vue-router';
+import { useUserStore } from '@/composables/user-store';
 
 const leftDrawerOpen = ref(false);
 
-const { sessionStorage, localStorage } = useQuasar();
 const router = useRouter();
-const route = useRoute();
 
-const logout = () => {
-	sessionStorage.remove('user');
-	localStorage.remove('token');
+const userStore = useUserStore();
+
+const logoutAndRedirectToLogin = () => {
+	userStore.logout();
 	router.push('/login');
 };
 
 const canAccess = (route: RouteRecordNormalized) => {
-	if (route.meta.requiresAuth) {
-		return localStorage.getItem('token');
+	// admin can access everything
+	if (userStore.isAdmin) {
+		return true;
 	}
 
-	const user = sessionStorage.getItem<{ scopes: Scope[] }>('user');
-	if (user && route.meta.requiresScopes) {
-		return user.scopes.some((scope) => route.meta.requiresScopes?.includes(scope));
+	// if route requires auth and user is not logged in, they can't access it
+	if (route.meta.requiresAuth && !userStore.isLoggedIn) {
+		return false;
+	}
+
+	// if user is logged in and route requires scopes, check if user has them
+	if (route.meta.requiredScopes) {
+		return userStore.hasScope(...route.meta.requiredScopes);
 	}
 
 	return true;
@@ -71,3 +76,14 @@ const routes = computed(() => {
 	return router.getRoutes().filter((route) => route.meta.inDrawer && canAccess(route));
 });
 </script>
+
+<style lang="scss" scoped>
+.active-link {
+	background-color: lighten($primary, 30%);
+	@if (lightness(lighten($primary, 30%)) > 40%) {
+		color: black;
+	} @else {
+		color: white;
+	}
+}
+</style>

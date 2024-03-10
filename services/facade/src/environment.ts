@@ -7,6 +7,8 @@ export const MQTT_URL = env.get('MQTT_URL').default(`mqtt://${MQTT_HOST}:${MQTT_
 export const API_HOST = env.get('API_HOST').default('0.0.0.0').asString();
 export const API_PORT = env.get('API_PORT').default(3000).asPortNumber();
 
+export const JWT_SECRET = env.get('JWT_SECRET').default('hunter2').asString();
+
 export const DATABASE_URL = env.get('DATABASE_URL').required().asUrlString();
 export const GROUPER_URL = env.get('GROUPER_URL').required().asUrlString();
 export const HOSTER_URL = env.get('HOSTER_URL').required().asUrlString();

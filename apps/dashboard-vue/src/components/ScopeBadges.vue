@@ -1,12 +1,12 @@
 <template>
 	<q-btn disable flat v-bind:key="chip.label" v-for="chip in chips" round :icon="chip.icon">
-		<q-badge floating>{{ chip.permissions }}</q-badge>
+		<q-badge floating color="primary">{{ chip.permissions }}</q-badge>
 	</q-btn>
 </template>
 
 <script setup lang="ts">
 import { computed, defineProps } from 'vue';
-import type { Scope } from '@/types/scopes';
+import type { Scope } from '@vsb-eink/facade-api-client';
 
 const props = defineProps<{
 	scopes: Scope[];

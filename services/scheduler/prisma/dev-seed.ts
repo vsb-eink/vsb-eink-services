@@ -7,13 +7,14 @@ await prisma.$transaction(async (tx) => {
 		data: {
 			id: 1,
 			target: 'all',
+			name: 'Lenna',
+			description: 'Lenna test image',
 			cron: '*/10 * * * * *',
-			command: 'display',
-			commandType: 'url_1bpp',
-			commandArgs: JSON.stringify([
+			command: 'display/url_1bpp/set',
+			content: JSON.stringify([
 				'https://upload.wikimedia.org/wikipedia/en/7/7d/Lenna_%28test_image%29.png',
 			]),
-			hasSeconds: true,
+			precise: true,
 		},
 	});
 });

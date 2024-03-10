@@ -11,8 +11,13 @@ export const maintenanceRoutes: FastifyPluginAsyncTypebox = async (app, opts) =>
 		url: '/sync',
 		onRequest: app.auth([verifyJWT, verifyRole(Role.ADMIN)], { relation: 'and' }),
 		handler: async (request, reply) => {
-			await sync();
-			return { success: true };
+			try {
+				await sync();
+				return { success: true };
+			} catch (e) {
+				app.log.error(e);
+				return reply.internalServerError();
+			}
 		},
 	});
 };

@@ -2,30 +2,59 @@ import { events } from './events.js';
 import { db } from './database.js';
 import axios from 'axios';
 import { joinUrl } from './utils.js';
-import { GROUPER_URL } from './environment.js';
+import { GROUPER_URL, SCHEDULER_URL } from './environment.js';
+import { Static } from '@fastify/type-provider-typebox';
+import { ScheduledJobSchema } from './schemas.js';
 
-export async function sync() {
-	const promises = [];
-
-	const groupsSync = (async () => {
-		const groups = await db.panelGroup.findMany({
-			select: {
-				id: true,
-				name: true,
-				panels: {
-					select: {
-						id: true,
-						name: true,
-					},
+async function syncGrouper() {
+	const groups = await db.panelGroup.findMany({
+		select: {
+			id: true,
+			name: true,
+			panels: {
+				select: {
+					id: true,
+					name: true,
 				},
 			},
-		});
+		},
+	});
 
-		await axios.put(joinUrl(GROUPER_URL, '/groups'), groups);
-	})();
-	promises.push(groupsSync);
+	await axios.put(joinUrl(GROUPER_URL, '/groups'), groups);
+}
 
-	await Promise.all(promises);
+async function syncScheduler() {
+	const panels = await db.panel.findMany({ select: { id: true } });
+	const groups = await db.panelGroup.findMany({ select: { id: true } });
+	const targets = [...panels.map((p) => p.id), ...groups.map((g) => g.id)];
+
+	const jobs = await axios.get<Static<typeof ScheduledJobSchema>[]>(
+		joinUrl(SCHEDULER_URL, '/jobs'),
+	);
+
+	const jobsToDelete = jobs.data.filter((job) => !targets.includes(job.target));
+
+	// no jobs to delete => for our purposes, data are in sync
+	if (jobsToDelete.length === 0) {
+		return;
+	}
+
+	const queryParams = new URLSearchParams();
+	jobsToDelete.forEach((job) => queryParams.append('ids', String(job.id)));
+
+	await axios.delete(joinUrl(SCHEDULER_URL, '/jobs'), {
+		params: queryParams,
+	});
+}
+
+export async function sync() {
+	const [grouperResult, schedulerResult] = await Promise.allSettled([
+		syncGrouper(),
+		syncScheduler(),
+	]);
+
+	console.log('Grouper sync result:', grouperResult.status);
+	console.log('Scheduler sync result:', schedulerResult.status);
 }
 
 export function createSyncWorker() {

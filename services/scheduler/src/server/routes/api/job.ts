@@ -9,6 +9,7 @@ import {
 	HttpErrorSchema,
 } from '../../schemas.js';
 import { db, Prisma } from '../../../database.js';
+import { isValidCron, isValidCronWithSeconds } from '../../../cron-utils.js';
 
 export const jobRoutes: FastifyPluginAsyncTypebox = async (app) => {
 	const getJobOpts = {
@@ -31,7 +32,7 @@ export const jobRoutes: FastifyPluginAsyncTypebox = async (app) => {
 
 		return {
 			...job,
-			commandArgs: JSON.parse(job.commandArgs),
+			content: JSON.parse(job.content),
 		};
 	});
 
@@ -47,14 +48,22 @@ export const jobRoutes: FastifyPluginAsyncTypebox = async (app) => {
 	} satisfies RouteShorthandOptions;
 	app.patch('/', updateJobOpts, async (req, reply) => {
 		try {
+			if (req.body.cron && !isValidCron(req.body.cron)) {
+				return reply.badRequest('Invalid cron expression');
+			}
+
 			const job = await db.eInkJob.update({
 				where: { id: req.params.id },
-				data: { ...req.body, commandArgs: JSON.stringify(req.body.commandArgs) },
+				data: {
+					...req.body,
+					content: JSON.stringify(req.body.content),
+					precise: req.body.cron ? isValidCronWithSeconds(req.body.cron) : undefined,
+				},
 			});
 
 			return {
 				...job,
-				commandArgs: JSON.parse(job.commandArgs),
+				content: JSON.parse(job.content),
 			};
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {

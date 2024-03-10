@@ -1,76 +1,537 @@
 openapi: 3.0.0
 info:
-  title: VSB EInk Facade Service
+  title: VSB EInk Facade Service API
   version: 1.0.0
+  description: An API for managing panels, users, and schedules in the VSB EInk Facade Service.
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
 components:
   securitySchemes:
-    bearerAuth:
+    tokenAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
   schemas:
-    LoginCredentials:
+    HttpError:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        code:
+          type: string
+        error:
+          type: string
+        message:
+          type: string
+
+    UnknownType: {}
+
+    Role:
+      type: string
+      enum: [ADMIN, USER]
+
+    Scope:
+      type: string
+      enum:
+        - HOSTED_READ
+        - HOSTED_WRITE
+        - PANELS_READ
+        - PANELS_WRITE
+        - USERS_READ
+        - USERS_WRITE
+        - SCHEDULE_READ
+        - SCHEDULE_WRITE
+
+    User:
+      type: object
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedUserGroup'
+      required: [id, username, role, groups]
+    InsertableUser:
       type: object
       properties:
         username:
           type: string
+        role:
+          $ref: '#/components/schemas/Role'
         password:
           type: string
-      required:
-        - username
-        - password
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkableUserGroup'
+      required: [username, password]
+    UpdatableUser:
+      type: object
+      properties:
+        username:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        password:
+          type: string
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkableUserGroup'
+    LinkableUser:
+      type: object
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+      required: [id]
+    LinkedUser:
+      type: object
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+          readOnly: true
+      required: [ id, username ]
+
+    Panel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedPanelGroup'
+      required: [id, name, groups]
+    InsertablePanel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkablePanelGroup'
+      required: [id]
+    UpdatablePanel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkablePanelGroup'
+    LinkablePanel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id]
+    LinkedPanel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          readOnly: true
+      required: [ id, name ]
+
+    PanelGroup:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        panels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedPanel'
+        managedBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedUserGroup'
+      required: [id, name, panels, managedBy]
+    InsertablePanelGroup:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        panels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkablePanel'
+        managedBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkableUserGroup'
+      required: [id]
+    UpdatablePanelGroup:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        panels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkablePanel'
+        managedBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkableUserGroup'
+    LinkablePanelGroup:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id]
+    LinkedPanelGroup:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          readOnly: true
+      required: [ id, name ]
+
+    UserGroup:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedUser'
+        managedPanelGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedPanelGroup'
+      required: [id, name, scopes, users, managedPanelGroups]
+    InsertableUserGroup:
+      type: object
+      properties:
+        name:
+          type: string
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        managedPanelGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkablePanelGroup'
+      required: [name]
+    UpdatableUserGroup:
+      type: object
+      properties:
+        name:
+          type: string
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkableUser'
+        managedPanelGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkablePanelGroup'
+    LinkableUserGroup:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+      required: [id]
+    LinkedUserGroup:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+          readOnly: true
+      required: [id, name]
+    
+    AuthenticatedUser:
+      type: object
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkableUserGroup'
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+      required: [id, username, role, groups, scopes]
+    
+    FileMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        type:
+          type: string
+          enum: [file]
+      required: [name, path, type]
+    DirectoryMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        type:
+          type: string
+          enum: [directory]
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentMetadata'
+      required: [name, path, type, children]
+
+    ContentMetadata:
+      oneOf:
+        - $ref: '#/components/schemas/FileMetadata'
+        - $ref: '#/components/schemas/DirectoryMetadata'
+    
+    ScheduledJob:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        cron:
+          type: string
+        target:
+          type: string
+        command:
+          type: string
+        content:
+          type: array
+          items:
+            type: string
+        precise:
+          type: boolean
+        priority:
+          type: number
+        cycle:
+          type: number
+        shouldCycle:
+          type: boolean
+        disabled:
+          type: boolean
+      required: [ id, name, description, cron, target, command, content, precise, priority, cycle, shouldCycle, disabled]
+    InsertableScheduledJob:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        cron:
+          type: string
+        target:
+          type: string
+        command:
+          type: string
+        content:
+          type: array
+          items:
+            type: string
+        priority:
+          type: number
+        shouldCycle:
+          type: boolean
+        disabled:
+          type: boolean
+      required: [name, cron, target, command]
+    UpdatableScheduledJob:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        cron:
+          type: string
+        target:
+          type: string
+        command:
+          type: string
+        content:
+          type: array
+          items:
+            type: string
+        priority:
+          type: number
+        cycle:
+          type: number
+        shouldCycle:
+          type: boolean
+        disabled:
+          type: boolean
+
+  parameters:
+    path:
+      name: path
+      in: path
+      required: true
+      schema:
+        type: string
+        default: ''
+    panelId:
+      name: panelId
+      in: path
+      required: true
+      schema:
+        type: string
+    panelGroupId:
+      name: panelGroupId
+      in: path
+      required: true
+      schema:
+        type: string
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: number
+    userGroupId:
+      name: userGroupId
+      in: path
+      required: true
+      schema:
+        type: number
+    jobId:
+      name: jobId
+      in: path
+      required: true
+      schema:
+        type: number
+    jobIds:
+      name: ids
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: number
+    jobTarget:
+      name: target
+      in: query
+      required: false
+      schema:
+        type: string
+    jobHasSeconds:
+      name: hasSeconds
+      in: query
+      required: false
+      schema:
+        type: boolean
+    jobDisabled:
+      name: disabled
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+  
   responses:
-    UnauthorizedError:
-      description: Unauthorized
+    UnknownResponse:
+      description: Unknown response
       content:
-        application/json:
+        '*/*':
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-                enum: [401]
-              error:
-                type: string
-                enum: [Unauthorized]
-              message:
-                type: string
-            required:
-              - statusCode
-              - error
-              - message
-    ForbiddenError:
-      description: Forbidden
+            $ref: '#/components/schemas/UnknownType'
+  requestBodies:
+    UnknownRequestBody:
       content:
-        application/json:
+        '*/*':
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-                enum: [403]
-              error:
-                type: string
-                enum: [Forbidden]
-              message:
-                type: string
-            required:
-              - statusCode
-              - error
-              - message
+            $ref: '#/components/schemas/UnknownType'
 paths:
   /auth/login:
     post:
-      summary: Login
       operationId: login
+      tags: [auth]
+      security: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginCredentials'
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
       responses:
         '200':
-          description: OK
+          description: Login successful
           content:
             application/json:
               schema:
@@ -78,19 +539,725 @@ paths:
                 properties:
                   token:
                     type: string
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-  /profile:
+                required:
+                  - token
+
   /maintenance/sync:
-  /panels:
+    post:
+      operationId: syncMicroservices
+      tags: [admin]
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: Sync successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                required:
+                  - status
+
+  /panels/:
+    get:
+      operationId: getPanels
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_READ]
+      responses:
+        '200':
+          description: List of panels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Panel'
+    post:
+      operationId: createPanel
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertablePanel'
+      responses:
+        '201':
+          description: Panel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Panel'
   /panels/{panelId}:
-  /panel-groups:
+    get:
+      operationId: getPanel
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_READ]
+      parameters:
+        - $ref: '#/components/parameters/panelId'
+      responses:
+        '200':
+          description: Requested panel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Panel'
+        '404':
+          description: Panel with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    patch:
+      operationId: updatePanel
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatablePanel'
+      parameters:
+        - $ref: '#/components/parameters/panelId'
+      responses:
+        '200':
+          description: Panel updated
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Panel'
+    delete:
+      operationId: deletePanel
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/panelId'
+      responses:
+        '200':
+          description: Panel deleted
+  /panel-groups/:
+    get:
+      operationId: getPanelGroups
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_READ]
+      responses:
+        '200':
+          description: List of panel groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PanelGroup'
+    post:
+      operationId: createPanelGroup
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertablePanelGroup'
+      responses:
+        '201':
+          description: Panel group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelGroup'
   /panel-groups/{panelGroupId}:
-  /users:
+    get:
+      operationId: getPanelGroup
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_READ]
+      parameters:
+        - $ref: '#/components/parameters/panelGroupId'
+      responses:
+        '200':
+          description: Requested panel group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelGroup'
+        '404':
+          description: Panel group with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    patch:
+      operationId: updatePanelGroup
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatablePanelGroup'
+      parameters:
+        - $ref: '#/components/parameters/panelGroupId'
+      responses:
+        '200':
+          description: Panel group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelGroup'
+        '404':
+          description: Panel group with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    delete:
+      operationId: deletePanelGroup
+      tags: [panels]
+      security:
+        - tokenAuth: [PANELS_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/panelGroupId'
+      responses:
+        '204':
+          description: Panel group deleted
+        '404':
+          description: Panel group with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+  /profile/:
+    get:
+      operationId: getProfile
+      tags: [users]
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: User profile of the authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedUser'
+  /users/:
+    get:
+      operationId: getUsers
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_READ]
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      operationId: createUser
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertableUser'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
   /users/{userId}:
+    get:
+      operationId: getUser
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_READ]
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: Requested user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    patch:
+      operationId: updateUser
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatableUser'
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: User with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+  /user-groups/:
+    get:
+      operationId: getUserGroups
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_READ]
+      responses:
+        '200':
+          description: List of user groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserGroup'
+    post:
+      operationId: createUserGroup
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertableUserGroup'
+      responses:
+        '201':
+          description: User group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGroup'
   /user-groups/{userGroupId}:
-  /schedule:
+    get:
+      operationId: getUserGroup
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_READ]
+      parameters:
+        - $ref: '#/components/parameters/userGroupId'
+      responses:
+        '200':
+          description: Requested user group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGroup'
+        '404':
+          description: User group with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    patch:
+      operationId: updateUserGroup
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatableUserGroup'
+      parameters:
+        - $ref: '#/components/parameters/userGroupId'
+      responses:
+        '200':
+          description: User group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGroup'
+        '404':
+          description: User group with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    delete:
+      operationId: deleteUserGroup
+      tags: [users]
+      security:
+        - tokenAuth: [USERS_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/userGroupId'
+      responses:
+        '204':
+          description: User group deleted
+        '404':
+          description: User group with the given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+  /schedule/:
+    get:
+      operationId: getScheduledJobs
+      tags: [schedule]
+      security:
+        - tokenAuth: [SCHEDULE_READ]
+      parameters:
+        - $ref: '#/components/parameters/jobTarget'
+        - $ref: '#/components/parameters/jobHasSeconds'
+        - $ref: '#/components/parameters/jobDisabled'
+      responses:
+        '200':
+          description: List of scheduled jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduledJob'
+    patch:
+      operationId: updateScheduledJobs
+      tags: [schedule]
+      security:
+        - tokenAuth: [SCHEDULE_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdatableScheduledJob'
+      responses:
+        '204':
+          description: Scheduled jobs updated
+    post:
+      operationId: createScheduledJob
+      tags: [schedule]
+      security:
+        - tokenAuth: [SCHEDULE_WRITE]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertableScheduledJob'
+      responses:
+        '201':
+          description: Scheduled job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledJob'
   /schedule/{jobId}:
-  /hosted/core/files:
-  /hosted/core/files/{path}:
+    get:
+      operationId: getScheduledJob
+      tags: [schedule]
+      security:
+        - tokenAuth: [SCHEDULE_READ]
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '200':
+          description: Requested scheduled job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledJob'
+    patch:
+      operationId: updateScheduledJob
+      tags: [schedule]
+      security:
+        - tokenAuth: [SCHEDULE_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatableScheduledJob'
+      responses:
+        '200':
+          description: Scheduled job updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledJob'
+    delete:
+      operationId: deleteScheduledJob
+      tags: [schedule]
+      security:
+        - tokenAuth: [SCHEDULE_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '204':
+          description: Scheduled job deleted
+
   /hosted/user/{path}:
+    get:
+      operationId: sendGetToContent
+      tags: [hosted, content]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/path'
+      responses:
+        default:
+          $ref: '#/components/responses/UnknownResponse'
+    post:
+      operationId: sendPostToContent
+      tags: [hosted, content]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/path'
+      requestBody:
+        $ref: '#/components/requestBodies/UnknownRequestBody'
+      responses:
+        default:
+          $ref: '#/components/responses/UnknownResponse'
+    put:
+      operationId: sendPutToContent
+      tags: [hosted, content]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/path'
+      requestBody:
+        $ref: '#/components/requestBodies/UnknownRequestBody'
+      responses:
+        default:
+          $ref: '#/components/responses/UnknownResponse'
+    patch:
+      operationId: sendPatchToContent
+      tags: [hosted, content]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/path'
+      requestBody:
+        $ref: '#/components/requestBodies/UnknownRequestBody'
+      responses:
+        default:
+          $ref: '#/components/responses/UnknownResponse'
+    delete:
+      operationId: sendDeleteToContent
+      tags: [hosted, content]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/path'
+      responses:
+        default:
+          $ref: '#/components/responses/UnknownResponse'
+
+  /hosted/core/ping:
+    get:
+      operationId: pingHostedCoreExample
+      tags: [hosted]
+      security:
+        - tokenAuth: [HOSTED_READ]
+      responses:
+        '200':
+          description: Ping successful
+          content:
+            text/plain:
+              schema:
+                type: string
+                default: 'pong'
+
+  /hosted/core/files/{path}:
+    get:
+      operationId: getContentMetadata
+      tags: [hosted, content]
+      security:
+        - tokenAuth: [HOSTED_READ]
+      parameters:
+        - $ref: '#/components/parameters/path'
+      responses:
+        '200':
+          description: Metadata of the requested file or directory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentMetadata'
+        '404':
+          description: File or directory not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    post:
+      operationId: uploadContent
+      tags: [hosted, content]
+      security:
+        - tokenAuth: [HOSTED_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/path'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Content uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentMetadata'
+        '409':
+          description: Path already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    put:
+      operationId: updateContent
+      tags: [hosted, content]
+      security:
+        - tokenAuth: [HOSTED_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/path'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Content updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentMetadata'
+        '201':
+          description: Content uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentMetadata'
+        '400':
+          description: Only single file can be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+        '409':
+          description: Path is a directory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    patch:
+      operationId: renameContent
+      tags: [hosted, content]
+      security:
+        - tokenAuth: [HOSTED_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/path'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required: [name]
+      responses:
+        '200':
+          description: Content renamed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentMetadata'
+        '400':
+          description: Invalid name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+        '404':
+          description: File or directory not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+    delete:
+      operationId: deleteContent
+      tags: [hosted, content]
+      security:
+        - tokenAuth: [HOSTED_WRITE]
+      parameters:
+        - $ref: '#/components/parameters/path'
+      responses:
+        204:
+          description: Content deleted successfully
+        404:
+          description: File or directory not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'

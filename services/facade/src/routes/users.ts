@@ -28,7 +28,13 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			[verifyJWT, verifyScope(Scope.USERS_READ)],
 		]),
 		handler: async (request, reply) => {
-			return db.user.findMany({ include: { groups: true } });
+			return db.user.findMany({
+				include: {
+					groups: {
+						select: { id: true, name: true },
+					},
+				},
+			});
 		},
 	});
 
@@ -54,7 +60,11 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 					role: request.body.role,
 					groups: { connect: request.body.groups?.map(({ id }) => ({ id })) },
 				},
-				include: { groups: true },
+				include: {
+					groups: {
+						select: { id: true, name: true },
+					},
+				},
 			});
 		},
 	});
@@ -78,9 +88,13 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			[verifyJWT, verifyProfileOwner],
 		]),
 		handler: async (request, reply) => {
-			const user = db.user.findUnique({
+			const user = await db.user.findUnique({
 				where: { id: request.params.userId },
-				include: { groups: true },
+				include: {
+					groups: {
+						select: { id: true, name: true },
+					},
+				},
 			});
 			if (!user) {
 				return reply.notFound();
@@ -127,7 +141,11 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 						password: newHashedPassword,
 						groups: request.body.groups ? { set: request.body.groups } : undefined,
 					},
-					include: { groups: true },
+					include: {
+						groups: {
+							select: { id: true, name: true },
+						},
+					},
 				});
 			} catch (error) {
 				if (isNotFoundError(error)) {

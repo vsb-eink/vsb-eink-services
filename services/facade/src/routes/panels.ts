@@ -8,6 +8,7 @@ import {
 	HttpErrorSchema,
 	InsertablePanelSchema,
 	PanelSchema,
+	registerCustomSchemas,
 	UpdatablePanelSchema,
 } from '../schemas.js';
 import { verifyAccessToPanel } from '../guards/owner.js';
@@ -18,7 +19,7 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		method: 'GET',
 		schema: {
 			response: {
-				200: Type.Array(PanelSchema),
+				200: Type.Array(Type.Ref(PanelSchema)),
 			},
 		},
 		onRequest: app.auth([
@@ -102,6 +103,10 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		schema: {
 			params: PanelPathParamsSchema,
 			body: UpdatablePanelSchema,
+			response: {
+				200: PanelSchema,
+				404: HttpErrorSchema,
+			},
 		},
 		onRequest: app.auth([
 			[verifyJWT, verifyRole(Role.ADMIN)],
@@ -134,7 +139,6 @@ export const panelsRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 		method: 'DELETE',
 		schema: {
 			params: PanelPathParamsSchema,
-			body: UpdatablePanelSchema,
 		},
 		onRequest: app.auth([
 			[verifyJWT, verifyRole(Role.ADMIN)],

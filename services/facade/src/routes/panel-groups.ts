@@ -37,7 +37,12 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 				where: {
 					managedBy: { some: { users: { some: { id: request.user.id } } } },
 				},
-				include: { panels: true, managedBy: true },
+				include: {
+					panels: true,
+					managedBy: {
+						select: { id: true, name: true },
+					},
+				},
 			});
 		},
 	});
@@ -68,7 +73,12 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 					panels: { connect: request.body.panels?.map(({ id }) => ({ id })) },
 					managedBy: { connect: request.body.managedBy?.map(({ id }) => ({ id })) },
 				},
-				include: { panels: true, managedBy: true },
+				include: {
+					panels: true,
+					managedBy: {
+						select: { id: true, name: true },
+					},
+				},
 			});
 		},
 	});
@@ -92,7 +102,12 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 		handler: async (request, reply) => {
 			const group = db.panelGroup.findUnique({
 				where: { id: request.params.panelGroupId },
-				include: { panels: true, managedBy: true },
+				include: {
+					panels: true,
+					managedBy: {
+						select: { id: true, name: true },
+					},
+				},
 			});
 
 			if (!group) {
@@ -136,7 +151,12 @@ export const panelGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 						panels: { set: request.body.panels?.map(({ id }) => ({ id })) },
 						managedBy: { set: request.body.managedBy?.map(({ id }) => ({ id })) },
 					},
-					include: { panels: true, managedBy: true },
+					include: {
+						panels: true,
+						managedBy: {
+							select: { id: true, name: true },
+						},
+					},
 				});
 
 				return group;

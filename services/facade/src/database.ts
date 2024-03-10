@@ -5,7 +5,7 @@ import { events } from './events.js';
 
 type PanelOperations = keyof (typeof db)['panel'];
 
-const MUTATING_OPERATIONS: PanelOperations[] = [
+export const MUTATING_OPERATIONS: PanelOperations[] = [
 	'create',
 	'createMany',
 	'deleteMany',
@@ -16,9 +16,8 @@ const MUTATING_OPERATIONS: PanelOperations[] = [
 ];
 
 function notifyOnChange({ operation, model }: { operation: PanelOperations; model: string }) {
-	if (MUTATING_OPERATIONS.includes(operation)) {
-		events.emit(`${model}:change`);
-	}
+	if (!MUTATING_OPERATIONS.includes(operation)) return;
+	events.emit(`${model}:change`, { operation });
 }
 
 export const db = new PrismaClient().$extends({

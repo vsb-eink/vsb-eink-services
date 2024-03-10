@@ -18,5 +18,13 @@ export function joinUrl(...parts: string[]): string {
 }
 
 export function extractWildcardParam(request: FastifyRequest) {
-	return request.url.replace(request.routeOptions.url.replace('*', ''), '');
+	if (!request.params) {
+		throw new Error(`Wildcard parameter not found`);
+	}
+
+	if (typeof (request.params as any)['*'] !== 'string') {
+		throw new TypeError(`Wildcard parameter is not a string`);
+	}
+
+	return (request.params as { '*': string })['*'];
 }

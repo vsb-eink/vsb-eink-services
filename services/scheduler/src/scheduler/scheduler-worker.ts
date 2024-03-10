@@ -7,7 +7,7 @@ import { MQTT_URL } from '../environment.js';
 import { createDatabaseClient } from '../database.js';
 
 export interface WorkerInput {
-	hasSeconds: boolean;
+	precise: boolean;
 }
 
 logger.info(`Loading prisma client`);
@@ -17,12 +17,12 @@ const mqtt = await connectAsync(MQTT_URL, {
 	clientId: 'scheduler_' + Math.random().toString(16).slice(2, 10),
 });
 
-export default async function ({ hasSeconds }: WorkerInput) {
+export default async function ({ precise }: WorkerInput) {
 	const now = new Date();
 
 	const jobs = await db.eInkJob.findMany({
 		where: {
-			hasSeconds,
+			precise,
 			disabled: false,
 		},
 		orderBy: [{ priority: 'asc' }, { target: 'asc' }],
@@ -43,7 +43,7 @@ export default async function ({ hasSeconds }: WorkerInput) {
 		const timeMatches = parseCronExpression(job.cron).matchDate(now);
 
 		if (timeMatches) {
-			const commandArguments = JSON.parse(job.commandArgs);
+			const commandArguments = JSON.parse(job.content);
 
 			if (!Array.isArray(commandArguments)) {
 				logger.error(`Command arguments for job ${job.id} are not an array`);
@@ -52,7 +52,7 @@ export default async function ({ hasSeconds }: WorkerInput) {
 
 			const isEmpty = commandArguments.length === 0;
 			if (isEmpty) {
-				await mqtt.publishAsync(getTopic(job.target, job.command, job.commandType), '');
+				await mqtt.publishAsync(getTopic(job.target, job.command), '');
 				skip = true;
 				continue;
 			}
@@ -60,7 +60,7 @@ export default async function ({ hasSeconds }: WorkerInput) {
 			const isCyclable = job.shouldCycle;
 			if (isCyclable) {
 				await mqtt.publishAsync(
-					getTopic(job.target, job.command, job.commandType),
+					getTopic(job.target, job.command),
 					commandArguments[job.cycle % commandArguments.length],
 				);
 				await db.eInkJob.update({
@@ -72,15 +72,12 @@ export default async function ({ hasSeconds }: WorkerInput) {
 			}
 
 			// TODO: Find a more universal way to handle this
-			await mqtt.publishAsync(
-				getTopic(job.target, job.command, job.commandType),
-				commandArguments[0],
-			);
+			await mqtt.publishAsync(getTopic(job.target, job.command), commandArguments[0]);
 			skip = true;
 		}
 	}
 }
 
-function getTopic(target: string, command: string, commandType: string): string {
-	return `vsb-eink/${target}/${command}/${commandType}/set`;
+function getTopic(target: string, command: string): string {
+	return `vsb-eink/${target}/${command}`;
 }

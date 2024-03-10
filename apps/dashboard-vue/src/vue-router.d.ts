@@ -1,11 +1,11 @@
 import 'vue-router';
-import type { Scope } from '@/types/scopes';
+import { Scope } from '@vsb-eink/facade-api-client';
 export {};
 
 declare module 'vue-router' {
 	interface RouteMeta {
 		title: string;
 		inDrawer: boolean;
-		requiresScopes?: Scope[];
+		requiredScopes?: Scope[];
 	}
 }

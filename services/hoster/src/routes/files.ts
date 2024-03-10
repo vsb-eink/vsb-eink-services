@@ -140,6 +140,7 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 			response: {
 				200: DirentSchema,
 				400: HttpErrorSchema,
+				404: HttpErrorSchema,
 				501: HttpErrorSchema,
 			},
 		},

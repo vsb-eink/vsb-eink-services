@@ -6,13 +6,13 @@ export const EmptyBodySchema = Type.Null();
 
 export const EInkJobSchema = Type.Object({
 	id: Type.Integer(),
-	name: Type.Union([Type.String(), Type.Null()]),
+	name: Type.String(),
+	description: Type.Union([Type.String(), Type.Null()]),
 	cron: Type.String(),
 	target: Type.String(),
 	command: Type.String(),
-	commandType: Type.String(),
-	commandArgs: Type.Array(Type.String()),
-	hasSeconds: Type.Boolean(),
+	content: Type.Array(Type.String()),
+	precise: Type.Boolean(),
 	priority: Type.Integer(),
 	cycle: Type.Integer(),
 	shouldCycle: Type.Boolean(),
@@ -21,25 +21,33 @@ export const EInkJobSchema = Type.Object({
 
 export const EInkJobSelectableSchema = EInkJobSchema;
 
-export const EInkJobUpdatableSchema = Type.Partial(EInkJobSchema);
+export const EInkJobUpdatableSchema = Type.Partial(
+	Type.Pick(EInkJobSchema, [
+		'name',
+		'description',
+		'cron',
+		'target',
+		'command',
+		'content',
+		'priority',
+		'cycle',
+		'shouldCycle',
+		'disabled',
+	]),
+);
+export const EInkJobBulkUpdatableSchema = Type.Array(
+	Type.Intersect([Type.Pick(EInkJobSchema, ['id']), EInkJobUpdatableSchema]),
+);
 
 export const EInkJobInsertableSchema = Type.Intersect([
-	Type.Pick(EInkJobSchema, ['cron', 'target', 'command', 'commandType']),
+	Type.Pick(EInkJobSchema, ['name', 'cron', 'target', 'command']),
 	Type.Partial(
-		Type.Pick(EInkJobSchema, [
-			'name',
-			'commandArgs',
-			'hasSeconds',
-			'priority',
-			'cycle',
-			'shouldCycle',
-			'disabled',
-		]),
+		Type.Pick(EInkJobSchema, ['description', 'content', 'priority', 'shouldCycle', 'disabled']),
 	),
 ]);
 
 export const EInkJobQuerySchema = Type.Partial(
-	Type.Pick(EInkJobSchema, ['target', 'hasSeconds', 'disabled']),
+	Type.Pick(EInkJobSchema, ['target', 'precise', 'disabled']),
 );
 
 export const EInkJobParamsSchema = Type.Object({

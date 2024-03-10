@@ -4,8 +4,9 @@ import { LocalStorage, Notify, SessionStorage } from 'quasar';
 
 import DashboardView from '@/views/DashboardView.vue';
 import MainLayout from '@/layouts/MainLayout.vue';
-import { Scope } from '@/types/scopes';
-import { http } from '@/services/http';
+import { api } from '@/services/api';
+import { Scope } from '@vsb-eink/facade-api-client';
+import { useUserStore } from '@/composables/user-store';
 
 export const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,32 +18,38 @@ export const router = createRouter({
 				{
 					path: '/',
 					name: 'dashboard',
-					component: DashboardView,
 					meta: {
 						title: 'Dashboard',
-						inDrawer: true,
-						requiresScopes: [],
+						inDrawer: false,
+						requiredScopes: [],
 					},
-				},
-				{
-					path: '/files',
-					name: 'files',
-					meta: {
-						title: 'Soubory',
-						inDrawer: true,
-						requiresScopes: [Scope.HOSTED_READ],
-					},
-					component: () => import('@/views/FilesView.vue'),
+					redirect: () => ({ name: 'schedule' }),
 				},
 				{
 					path: '/schedule',
-					name: 'schedule',
-					meta: {
-						title: 'Plánovač',
-						inDrawer: true,
-						requiresScopes: [Scope.SCHEDULE_READ],
-					},
-					component: () => import('@/views/ScheduleView.vue'),
+					children: [
+						{
+							path: '',
+							name: 'schedule',
+							meta: {
+								title: 'Plánované úlohy',
+								inDrawer: true,
+								requiredScopes: [Scope.ScheduleRead],
+							},
+							component: () => import('@/views/schedule/ScheduledJobsListView.vue'),
+						},
+						{
+							path: ':id',
+							name: 'schedule-detail',
+							props: (to) => ({ id: Number(to.params.id) }),
+							meta: {
+								title: 'Detail plánované úlohy',
+								inDrawer: false,
+								requiresScopes: [Scope.ScheduleRead],
+							},
+							component: () => import('@/views/schedule/ScheduledJobView.vue'),
+						},
+					],
 				},
 				{
 					path: '/panels',
@@ -53,19 +60,20 @@ export const router = createRouter({
 							meta: {
 								title: 'Panely',
 								inDrawer: true,
-								requiresScopes: [Scope.PANELS_READ],
+								requiredScopes: [Scope.PanelsRead],
 							},
 							component: () => import('@/views/panels/PanelListView.vue'),
 						},
 						{
 							path: ':id',
 							name: 'panel-detail',
+							props: (to) => ({ id: to.params.id }),
 							meta: {
 								title: 'Detail panelu',
 								inDrawer: false,
-								requiresScopes: [Scope.PANELS_READ],
+								requiresScopes: [Scope.PanelsRead],
 							},
-							component: () => import('@/views/panels/PanelDetailView.vue'),
+							component: () => import('@/views/panels/PanelView.vue'),
 						},
 					],
 				},
@@ -78,19 +86,20 @@ export const router = createRouter({
 							meta: {
 								title: 'Skupiny panelů',
 								inDrawer: true,
-								requiresScopes: [Scope.PANELS_READ],
+								requiredScopes: [Scope.PanelsRead],
 							},
 							component: () => import('@/views/panels/PanelGroupListView.vue'),
 						},
 						{
 							path: ':id',
 							name: 'panel-group-detail',
+							props: (to) => ({ id: to.params.id }),
 							meta: {
 								title: 'Detail skupiny panelů',
 								inDrawer: false,
-								requiresScopes: [Scope.PANELS_READ],
+								requiresScopes: [Scope.PanelsRead],
 							},
-							component: () => import('@/views/panels/PanelGroupDetailView.vue'),
+							component: () => import('@/views/panels/PanelGroupView.vue'),
 						},
 					],
 				},
@@ -103,19 +112,20 @@ export const router = createRouter({
 							meta: {
 								title: 'Uživatelé',
 								inDrawer: true,
-								requiresScopes: [Scope.USERS_READ],
+								requiredScopes: [Scope.UsersRead],
 							},
 							component: () => import('@/views/users/UserListView.vue'),
 						},
 						{
 							path: ':id',
 							name: 'user-detail',
+							props: (to) => ({ id: Number(to.params.id) }),
 							meta: {
 								title: 'Detail uživatele',
 								inDrawer: false,
-								requiresScopes: [Scope.USERS_READ],
+								requiresScopes: [Scope.UsersRead],
 							},
-							component: () => import('@/views/users/UserDetailView.vue'),
+							component: () => import('@/views/users/UserView.vue'),
 						},
 					],
 				},
@@ -128,30 +138,32 @@ export const router = createRouter({
 							meta: {
 								title: 'Skupiny uživatelů',
 								inDrawer: true,
-								requiresScopes: [Scope.USERS_READ],
+								requiredScopes: [Scope.UsersRead],
 							},
 							component: () => import('@/views/users/UserGroupListView.vue'),
 						},
 						{
 							path: ':id',
 							name: 'user-group-detail',
+							props: (to) => ({ id: Number(to.params.id) }),
 							meta: {
 								title: 'Detail skupiny uživatelů',
 								inDrawer: false,
-								requiresScopes: [Scope.USERS_READ],
+								requiresScopes: [Scope.UsersRead],
 							},
-							component: () => import('@/views/users/UserGroupDetailView.vue'),
+							component: () => import('@/views/users/UserGroupView.vue'),
 						},
 					],
 				},
 				{
-					path: '/settings',
-					name: 'settings',
+					path: '/files',
+					name: 'files',
 					meta: {
-						title: 'Nastavení',
+						title: 'Soubory',
 						inDrawer: true,
+						requiredScopes: [Scope.HostedRead],
 					},
-					component: () => import('@/views/SettingsView.vue'),
+					component: () => import('@/views/FilesView.vue'),
 				},
 			],
 		},
@@ -165,8 +177,8 @@ export const router = createRouter({
 			component: () => import('@/views/LoginView.vue'),
 		},
 		{
-			path: '/:catchAll(.*)',
-			name: '404',
+			path: '/:pathMatch(.*)*',
+			name: 'NotFound',
 			component: () => import('@/views/NotFoundView.vue'),
 		},
 	],
@@ -184,24 +196,18 @@ router.beforeEach((to) => {
 });
 
 export async function canUserAccess(route: RouteLocationNormalized): Promise<boolean> {
-	if (!route.meta.requiresScopes || route.meta.requiresScopes.length === 0) {
+	if (!route.meta.requiredScopes || route.meta.requiredScopes.length === 0) {
 		return true;
 	}
 
-	if (!SessionStorage.has('user')) {
-		const user = await http.get('/profile');
-		SessionStorage.set('user', user.data);
-	}
-	const user = SessionStorage.getItem<{ scopes: Scope[] }>('user');
+	const user = useUserStore();
 
-	if (!user) {
+	if (!user.isLoggedIn || !user.profile) {
 		return false;
 	}
 
-	for (const requiredScope of route.meta.requiresScopes) {
-		if (!user.scopes.includes(requiredScope)) {
-			return false;
-		}
+	if (!user.hasScope(...route.meta.requiredScopes)) {
+		return false;
 	}
 
 	return true;

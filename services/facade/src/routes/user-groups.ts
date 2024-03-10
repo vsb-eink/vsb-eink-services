@@ -52,7 +52,10 @@ export const userGroupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 						connect: request.body.managedPanelGroups?.map(({ id }) => ({ id })),
 					},
 				},
-				include: { users: true, managedPanelGroups: true },
+				include: {
+					users: true,
+					managedPanelGroups: true,
+				},
 			});
 		},
 	});

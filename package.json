@@ -1,17 +1,8 @@
 {
-  "name": "vsb-eink-services",
-  "version": "1.0.0",
+  "name": "@vsb-eink/services",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "Marek Lukas <luk0125@vsb.cz>",
   "license": "ISC",
-  "pnpm": {
-    "patchedDependencies": {
-      "@fastify/auth@4.6.0": "patches/@fastify__auth@4.6.0.patch"
-    }
-  }
+  "private": true
 }

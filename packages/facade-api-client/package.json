@@ -1,0 +1,26 @@
+{
+  "name": "@vsb-eink/facade-api-client",
+  "version": "1.0.0",
+  "description": "API client for the facade service",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "generate": "openapi-generator-cli generate && pnpm run patch && prettier --write src",
+    "patch": "node ./patches/remove-path-param-encoding.cjs src/generated/api.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "prettier": "@vsb-eink/prettier-config",
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.9.0",
+    "@vsb-eink/prettier-config": "workspace:^",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
+}

@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node dist/vsb-eink-facade.js",
     "dev": "tsx watch src/vsb-eink-facade.ts",
+    "generate": "tsx scripts/generate-schemas.ts",
     "build": "tsc"
   },
   "keywords": [],
@@ -21,7 +22,7 @@
   },
   "prettier": "@vsb-eink/prettier-config",
   "dependencies": {
-    "@fastify/auth": "^4.6.0",
+    "@fastify/auth": "^4.6.1",
     "@fastify/cors": "^8.4.1",
     "@fastify/http-proxy": "^9.4.0",
     "@fastify/jwt": "^8.0.0",
@@ -46,8 +47,12 @@
     "@vsb-eink/eslint-config": "workspace:^",
     "@vsb-eink/prettier-config": "workspace:^",
     "@vsb-eink/tsconfig": "workspace:^",
+    "fix-esm-import-path": "^1.5.0",
+    "openapi-ts-json-schema": "^0.8.0",
+    "prettier": "^3.2.5",
     "prisma": "^5.9.1",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "yaml": "^2.4.0"
   }
 }
