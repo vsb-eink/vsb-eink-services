@@ -1,5 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/facade-client';
-export * from '@prisma/facade-client';
+import { PrismaClient, Prisma } from './generated/@prisma/facade-client/index.js';
+export * from './generated/@prisma/facade-client/index.js';
 
 import { events } from './events.js';
 

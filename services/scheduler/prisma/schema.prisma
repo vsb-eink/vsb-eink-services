@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/@prisma/scheduler-client"
+  output   = "../src/generated/@prisma/scheduler-client"
 }
 
 datasource db {

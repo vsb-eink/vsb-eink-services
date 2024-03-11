@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/grouper-client';
-export * from '@prisma/grouper-client';
+import { PrismaClient } from './generated/@prisma/grouper-client/index.js';
+export * from './generated/@prisma/grouper-client/index.js';
 
 export const db = new PrismaClient();

@@ -6,6 +6,7 @@ node_modules/
 
 # artifacts
 dist/
+src/generated/
 
 # default config location
 groups.json

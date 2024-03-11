@@ -2,8 +2,7 @@ import { onRequestHookHandler } from 'fastify';
 import { Type } from '@fastify/type-provider-typebox';
 import { TypeCompiler } from '@sinclair/typebox/compiler';
 
-import { db } from '../database.js';
-import { Scope } from '@prisma/facade-client';
+import { db, Scope } from '../database.js';
 import { httpErrors } from '@fastify/sensible';
 
 const AccessTokenPayload = Type.Object({
