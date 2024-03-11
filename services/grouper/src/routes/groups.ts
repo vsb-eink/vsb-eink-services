@@ -164,7 +164,7 @@ export const groupsRoutes: FastifyPluginAsyncTypebox = async (app) => {
 							data: {
 								panels: {
 									set: [],
-									connectOrCreate: request.body.panels?.map((panel: Panel) => ({
+									connectOrCreate: request.body.panels.map((panel) => ({
 										where: { id: panel.id },
 										create: panel,
 									})),
