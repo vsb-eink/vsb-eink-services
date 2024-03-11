@@ -7,7 +7,15 @@
     <title>VŠB EInk</title>
   </head>
   <body>
+    <!-- main app element -->
     <div id="app"></div>
+
+    <!-- import-meta-env -->
+    <script>
+        globalThis.import_meta_env = JSON.parse('"import_meta_env_placeholder"')
+    </script>
+
+    <!-- main app script -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
