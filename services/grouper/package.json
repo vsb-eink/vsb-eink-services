@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/vsb-eink-grouper.ts",
-    "start": "node dist/vsb-eink-grouper.js"
+    "start": "node dist/vsb-eink-grouper.js",
+    "generate": "prisma generate"
   },
   "keywords": [],
   "author": "",

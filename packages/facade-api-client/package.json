@@ -7,7 +7,7 @@
   "module": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "generate": "openapi-generator-cli generate && pnpm run patch && prettier --write src",
+    "generate": "openapi-generator-cli generate  && pnpm run patch && prettier --write src",
     "patch": "node ./patches/remove-path-param-encoding.cjs src/generated/api.ts"
   },
   "keywords": [],

@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node dist/vsb-eink-facade.js",
     "dev": "tsx watch src/vsb-eink-facade.ts",
-    "generate": "tsx scripts/generate-schemas.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "generate": "prisma generate"
   },
   "keywords": [],
   "author": "",
