@@ -15,7 +15,7 @@
   "license": "ISC",
   "prettier": "@vsb-eink/prettier-config",
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.9.0",
+    "@openapitools/openapi-generator-cli": "^2.11.0",
     "@vsb-eink/prettier-config": "workspace:^",
     "prettier": "^3.2.5",
     "typescript": "^5.3.3"
