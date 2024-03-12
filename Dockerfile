@@ -1,12 +1,20 @@
 FROM node:21-slim AS builder-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN apt-get update && apt-get install default-jre -y && corepack enable
+RUN apt-get update && \
+    apt-get install openssl default-jre -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    corepack enable pnpm && \
+    pnpm -v
 
 FROM node:21-slim AS runner-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN apt-get update && \
+    apt-get install openssl -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    corepack enable pnpm && \
+    pnpm -v
 
 FROM builder-base AS repo-with-deps
 WORKDIR /usr/src/app
