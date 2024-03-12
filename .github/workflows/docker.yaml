@@ -54,7 +54,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/vsb-eink/${{ matrix.package-name }}
           tags: |
-            type=match,pattern=\d.\d.\d
+            type=semver,pattern={{version}}
 
       - name: Build and push image
         if: steps.check-tag.outputs.should_run == 'true'
