@@ -38,6 +38,25 @@
 
 						<q-item>
 							<q-item-section>
+								<q-item-label>Heslo</q-item-label>
+							</q-item-section>
+							<q-item-section>
+								<q-input
+									v-if="localUser"
+									v-model="password"
+									:disable="
+										!loggedInUser.isAdmin ||
+										localUser.id === loggedInUser.profile?.id
+									"
+									:rules="[isNotEmpty]"
+									type="password"
+								/>
+								<q-skeleton v-else></q-skeleton>
+							</q-item-section>
+						</q-item>
+
+						<q-item>
+							<q-item-section>
 								<q-item-label>Role</q-item-label>
 							</q-item-section>
 							<q-item-section>
@@ -90,11 +109,13 @@ import { api, isNotFoundError } from '@/services/api';
 import { redirectToNotFound } from '@/router/error-redirect';
 import { useForm } from '@/composables/form';
 import { isNotEmpty } from '@/utils/validators';
+import { useUserStore } from '@/composables/user-store';
 
 const props = defineProps<{ id: number }>();
 
 const route = useRoute();
 const { notify } = useQuasar();
+const loggedInUser = useUserStore();
 
 const {
 	localData: localUser,
@@ -103,6 +124,7 @@ const {
 	dirtyProps,
 	validationErrorNotification,
 } = useForm<User | null>(null);
+const password = ref('');
 
 const groups = ref<LinkableUserGroup[]>([]);
 
@@ -110,7 +132,10 @@ const pushData = async () => {
 	if (!localUser.value) return;
 	try {
 		serverUser.value = await api.users
-			.updateUser(localUser.value.id, dirtyProps.value)
+			.updateUser(localUser.value.id, {
+				...dirtyProps.value,
+				password: password.value || undefined,
+			})
 			.then((res) => res.data);
 		notify({ message: 'Uživatel byl úspěšně upraven', color: 'positive' });
 	} catch (error) {
@@ -120,6 +145,7 @@ const pushData = async () => {
 
 const pullData = async () => {
 	try {
+		password.value = '';
 		serverUser.value = await api.users.getUser(props.id).then((res) => res.data);
 		groups.value = await api.users
 			.getUserGroups()
