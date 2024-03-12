@@ -4,9 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && shx cp src/generated dist/",
     "dev": "tsx watch src/vsb-eink-grouper.ts",
-    "start": "node dist/vsb-eink-grouper.js",
+    "start": "prisma migrate deploy && node dist/vsb-eink-grouper.js",
     "generate": "prisma generate"
   },
   "keywords": [],
@@ -14,6 +14,8 @@
   "license": "ISC",
   "files": [
     "dist",
+    "prisma/migrations",
+    "prisma/schema.prisma",
     "README"
   ],
   "prisma": {
@@ -21,23 +23,24 @@
   },
   "prettier": "@vsb-eink/prettier-config",
   "devDependencies": {
+    "@prisma/client": "^5.10.2",
     "@types/node": "^20.10.0",
     "@vsb-eink/eslint-config": "workspace:^",
     "@vsb-eink/prettier-config": "workspace:^",
     "@vsb-eink/tsconfig": "workspace:^",
     "prettier": "^3.1.0",
-    "prisma": "^5.10.2",
+    "shx": "^0.3.4",
     "tsx": "^4.5.0",
     "typescript": "^5.3.2"
   },
   "dependencies": {
     "@fastify/sensible": "^5.5.0",
     "@fastify/type-provider-typebox": "^3.6.0",
-    "@prisma/client": "^5.10.2",
     "dotenv": "^16.4.4",
     "env-var": "^7.4.1",
     "fastify": "^4.26.0",
     "lowdb": "^6.1.1",
-    "mqtt": "^5.3.0"
+    "mqtt": "^5.3.0",
+    "prisma": "^5.10.2"
   }
 }

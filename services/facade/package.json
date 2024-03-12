@@ -5,9 +5,9 @@
   "type": "module",
   "main": "src/vsb-eink-facade.ts",
   "scripts": {
-    "start": "node dist/vsb-eink-facade.js",
+    "start": "prisma migrate deploy && node dist/vsb-eink-facade.js",
     "dev": "tsx watch src/vsb-eink-facade.ts",
-    "build": "tsc",
+    "build": " tsc && shx cp -r src/generated dist/",
     "generate": "prisma generate"
   },
   "keywords": [],
@@ -15,6 +15,8 @@
   "license": "ISC",
   "files": [
     "dist",
+    "prisma/migrations",
+    "prisma/schema.prisma",
     "README.md"
   ],
   "prisma": {
@@ -32,7 +34,6 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^3.0.0",
     "@fastify/type-provider-typebox": "^4.0.0",
-    "@prisma/client": "^5.9.1",
     "@sinclair/typebox": "^0.32.14",
     "argon2": "^0.31.2",
     "axios": "^1.6.7",
@@ -40,9 +41,11 @@
     "env-var": "^7.4.1",
     "fastify": "^4.26.0",
     "fastify-guard": "^2.0.0",
-    "mqtt": "^5.3.5"
+    "mqtt": "^5.3.5",
+    "prisma": "^5.9.1"
   },
   "devDependencies": {
+    "@prisma/client": "5.9.1",
     "@types/node": "^20.11.17",
     "@vsb-eink/eslint-config": "workspace:^",
     "@vsb-eink/prettier-config": "workspace:^",
@@ -50,7 +53,7 @@
     "fix-esm-import-path": "^1.5.0",
     "openapi-ts-json-schema": "^0.8.0",
     "prettier": "^3.2.5",
-    "prisma": "^5.9.1",
+    "shx": "^0.3.4",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",
     "yaml": "^2.4.0"

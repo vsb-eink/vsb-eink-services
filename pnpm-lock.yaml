@@ -226,9 +226,6 @@ importers:
       '@fastify/type-provider-typebox':
         specifier: ^4.0.0
         version: 4.0.0(@sinclair/typebox@0.32.14)
-      '@prisma/client':
-        specifier: ^5.9.1
-        version: 5.9.1(prisma@5.9.1)
       '@sinclair/typebox':
         specifier: ^0.32.14
         version: 0.32.14
@@ -253,7 +250,13 @@ importers:
       mqtt:
         specifier: ^5.3.5
         version: 5.3.5
+      prisma:
+        specifier: ^5.9.1
+        version: 5.9.1
     devDependencies:
+      '@prisma/client':
+        specifier: 5.9.1
+        version: 5.9.1(prisma@5.9.1)
       '@types/node':
         specifier: ^20.11.17
         version: 20.11.17
@@ -275,9 +278,9 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.2.5
-      prisma:
-        specifier: ^5.9.1
-        version: 5.9.1
+      shx:
+        specifier: ^0.3.4
+        version: 0.3.4
       tsx:
         specifier: ^4.7.1
         version: 4.7.1
@@ -296,9 +299,6 @@ importers:
       '@fastify/type-provider-typebox':
         specifier: ^3.6.0
         version: 3.6.0(@sinclair/typebox@0.32.15)
-      '@prisma/client':
-        specifier: ^5.10.2
-        version: 5.10.2(prisma@5.10.2)
       dotenv:
         specifier: ^16.4.4
         version: 16.4.4
@@ -314,7 +314,13 @@ importers:
       mqtt:
         specifier: ^5.3.0
         version: 5.3.4
+      prisma:
+        specifier: ^5.10.2
+        version: 5.10.2
     devDependencies:
+      '@prisma/client':
+        specifier: ^5.10.2
+        version: 5.10.2(prisma@5.10.2)
       '@types/node':
         specifier: ^20.10.0
         version: 20.10.8
@@ -330,9 +336,9 @@ importers:
       prettier:
         specifier: ^3.1.0
         version: 3.1.1
-      prisma:
-        specifier: ^5.10.2
-        version: 5.10.2
+      shx:
+        specifier: ^0.3.4
+        version: 0.3.4
       tsx:
         specifier: ^4.5.0
         version: 4.7.0
@@ -464,9 +470,6 @@ importers:
       '@fastify/type-provider-typebox':
         specifier: ^3.5.0
         version: 3.6.0(@sinclair/typebox@0.32.15)
-      '@prisma/client':
-        specifier: ^5.9.1
-        version: 5.9.1(prisma@5.9.1)
       cron-schedule:
         specifier: ^4.0.0
         version: 4.0.0
@@ -494,10 +497,16 @@ importers:
       piscina:
         specifier: ^4.3.1
         version: 4.3.1
+      prisma:
+        specifier: ^5.9.1
+        version: 5.9.1
       winston:
         specifier: ^3.11.0
         version: 3.11.0
     devDependencies:
+      '@prisma/client':
+        specifier: ^5.9.1
+        version: 5.9.1(prisma@5.9.1)
       '@types/node':
         specifier: ^20.9.0
         version: 20.10.8
@@ -516,9 +525,9 @@ importers:
       prettier:
         specifier: ^3.1.0
         version: 3.1.1
-      prisma:
-        specifier: ^5.9.1
-        version: 5.9.1
+      shx:
+        specifier: ^0.3.4
+        version: 0.3.4
       tsx:
         specifier: ^4.1.1
         version: 4.7.0
@@ -1395,7 +1404,7 @@ packages:
         optional: true
     dependencies:
       prisma: 5.10.2
-    dev: false
+    dev: true
 
   /@prisma/client@5.9.1(prisma@5.9.1):
     resolution: {integrity: sha512-caSOnG4kxcSkhqC/2ShV7rEoWwd3XrftokxJqOCMVvia4NYV/TPtJlS9C2os3Igxw/Qyxumj9GBQzcStzECvtQ==}
@@ -1408,7 +1417,7 @@ packages:
         optional: true
     dependencies:
       prisma: 5.9.1
-    dev: false
+    dev: true
 
   /@prisma/debug@5.10.2:
     resolution: {integrity: sha512-bkBOmH9dpEBbMKFJj8V+Zp8IZHIBjy3fSyhLhxj4FmKGb/UBSt9doyfA6k1UeUREsMJft7xgPYBbHSOYBr8XCA==}
@@ -4040,6 +4049,11 @@ packages:
       side-channel: 1.0.4
     dev: false
 
+  /interpret@1.4.0:
+    resolution: {integrity: sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==}
+    engines: {node: '>= 0.10'}
+    dev: true
+
   /into-stream@6.0.0:
     resolution: {integrity: sha512-XHbaOAvP+uFKUFsOgoNPRjLkwB+I22JFPFe5OjTkQ0nwgj6+pSjb4NmB6VMxaPshLiOf+zcpOCBQuLwC1KHhZA==}
     engines: {node: '>=10'}
@@ -5382,6 +5396,13 @@ packages:
     engines: {node: '>= 12.13.0'}
     dev: false
 
+  /rechoir@0.6.2:
+    resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
+    engines: {node: '>= 0.10'}
+    dependencies:
+      resolve: 1.22.8
+    dev: true
+
   /reflect-metadata@0.1.13:
     resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
     dev: true
@@ -5667,6 +5688,25 @@ packages:
 
   /shell-quote@1.8.1:
     resolution: {integrity: sha512-6j1W9l1iAs/4xYBI1SYOVZyFcCis9b4KCLQ8fgAGG07QvzaRLVVRQvAy85yNmmZSjYjg4MWh4gNvlPujU/5LpA==}
+    dev: true
+
+  /shelljs@0.8.5:
+    resolution: {integrity: sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==}
+    engines: {node: '>=4'}
+    hasBin: true
+    dependencies:
+      glob: 7.2.3
+      interpret: 1.4.0
+      rechoir: 0.6.2
+    dev: true
+
+  /shx@0.3.4:
+    resolution: {integrity: sha512-N6A9MLVqjxZYcVn8hLmtneQWIJtp8IKzMP4eMnx+nqkvXoqinUPCbUFLp2UcWTEIUONhlk0ewxr/jaVGlc+J+g==}
+    engines: {node: '>=6'}
+    hasBin: true
+    dependencies:
+      minimist: 1.2.8
+      shelljs: 0.8.5
     dev: true
 
   /side-channel@1.0.4:
