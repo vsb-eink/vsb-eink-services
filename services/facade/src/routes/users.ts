@@ -51,7 +51,11 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 			[verifyJWT, verifyRole(Role.ADMIN)],
 			[verifyJWT, verifyScope(Scope.USERS_WRITE)],
 		]),
-		handler: async (request) => {
+		handler: async (request, reply) => {
+			if (request.body.role === Role.ADMIN && request.user.role !== Role.ADMIN) {
+				return reply.forbidden('Only admins can create admin users');
+			}
+
 			const hashedPassword = await argon2.hash(request.body.password);
 			return await db.user.create({
 				data: {
@@ -127,6 +131,14 @@ export const usersRoutes: FastifyPluginAsyncTypebox = async (app, opts) => {
 					!request.user.scopes.includes(Scope.USERS_WRITE)
 				) {
 					return reply.forbidden();
+				}
+
+				if (request.body.role === Role.ADMIN && request.user.role !== Role.ADMIN) {
+					return reply.forbidden('Only admins can update user roles');
+				}
+
+				if (request.body.password && ((request.user.role !== Role.ADMIN) && (request.user.id !== request.params.userId))) {
+					return reply.forbidden('Only admins can update other user\'s passwords');
 				}
 
 				const newHashedPassword = request.body.password
