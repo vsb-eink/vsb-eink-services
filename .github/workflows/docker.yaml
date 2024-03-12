@@ -37,11 +37,16 @@ jobs:
 
       - name: Check if package version has changed
         id: check-version
+        if: ${{ github.event_name == 'push' }}
         uses: EndBug/version-check@v2
         with:
           diff-search: true
-          static-checking: localIsNew
           file-name: ${{ matrix.package-path }}/package.json
+
+      - name: Override package version check for manual workflow dispatch
+        id: check-version
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Login to Github Registry
         if: steps.check-version.outputs.changed == 'true'
