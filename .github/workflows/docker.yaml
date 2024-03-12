@@ -46,7 +46,7 @@ jobs:
       - name: Override package version check for manual workflow dispatch
         id: manual-version-override
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: echo "changed=true" >> "$GITHUB_OUTPUT" && echo "version=${{ format('{0}/package.json', fromJSON(matrix.package-path).version) }}" >> "$GITHUB_OUTPUT"
+        run: echo "changed=true" >> "$GITHUB_OUTPUT" && echo "version=$(jq -r .version ${{matrix.package-path}}/package.json)" >> "$GITHUB_OUTPUT"
 
       - name: Login to Github Registry
         if: steps.check-version.outputs.changed == 'true' || steps.manual-version-override.outputs.changed == 'true'
