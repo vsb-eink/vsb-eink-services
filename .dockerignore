@@ -1,5 +1,14 @@
-node_modules
+# git
 .git
 .gitignore
+
 *.md
+*.db
+
+.idea
+
+generated
 dist
+node_modules
+
+.env

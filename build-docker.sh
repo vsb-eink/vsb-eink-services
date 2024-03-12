@@ -3,7 +3,7 @@
 # set workdir relative to the script
 cd "$(dirname "$0")"
 
-service_paths=$(echo services/*)
+service_paths=$(echo services/* apps/*)
 for service_path in ${service_paths[@]}; do
     service_name="$(basename "$service_path")"
     service_version="$(jq -r '.version' "$service_path/package.json")"
