@@ -39,6 +39,8 @@ jobs:
         id: check-version
         uses: EndBug/version-check@v2
         with:
+          diff-search: true
+          static-checking: localIsNew
           file-name: ${{ matrix.package-path }}/package.json
 
       - name: Login to Github Registry
@@ -55,4 +57,5 @@ jobs:
         with:
           context: .
           push: true
+          target: ${{ matrix.package-name }}
           tags: vsb-eink/${{ matrix.package-name }}:latest,vsb-eink/${{ matrix.package-name }}:${{ steps.check-version.outputs.version }}
