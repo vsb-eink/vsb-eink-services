@@ -10,7 +10,8 @@ RUN corepack enable
 
 FROM builder-base AS repo-with-deps
 WORKDIR /usr/src/app
-COPY pnpm-lock.yaml patches ./
+COPY pnpm-lock.yaml ./
+COPY patches/ patches/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 COPY . .
 RUN pnpm install --offline
