@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "build": "tsc && shx cp src/generated dist/",
+    "build": "tsc && shx cp -r src/generated dist/",
     "start": "prisma migrate deploy && node dist/vsb-eink-scheduler.js",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
