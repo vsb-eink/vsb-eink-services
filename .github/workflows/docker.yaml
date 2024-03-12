@@ -44,12 +44,12 @@ jobs:
           file-name: ${{ matrix.package-path }}/package.json
 
       - name: Override package version check for manual workflow dispatch
-        id: check-version
+        id: check-version-override
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Login to Github Registry
-        if: steps.check-version.outputs.changed == 'true'
+        if: steps.check-version.outputs.changed == 'true' || steps.check-version-override.outputs.changed == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -57,7 +57,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push image
-        if: steps.check-version.outputs.changed == 'true'
+        if: steps.check-version.outputs.changed == 'true' || steps.check-version-override.outputs.changed == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
