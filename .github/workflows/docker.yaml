@@ -36,11 +36,11 @@ jobs:
         run: echo "should_run=${{ startsWith(github.ref_name, matrix.package-name) && 'true' || 'false' }}" >> $GITHUB_OUTPUT
 
       - name: Checkout
-        if: steps.check_tag.outputs.should_run == 'true'
+        if: steps.check-tag.outputs.should_run == 'true'
         uses: actions/checkout@v4
 
       - name: Login to Github Registry
-        if: steps.check_tag.outputs.should_run == 'true'
+        if: steps.check-tag.outputs.should_run == 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -49,7 +49,7 @@ jobs:
 
       - name: Extract metadata for Docker image
         id: metadata
-        if: steps.check_tag.outputs.should_run == 'true'
+        if: steps.check-tag.outputs.should_run == 'true'
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/vsb-eink/${{ matrix.package-name }}
@@ -57,7 +57,7 @@ jobs:
             type=match,pattern=\d.\d.\d
 
       - name: Build and push image
-        if: steps.check_tag.outputs.should_run == 'true'
+        if: steps.check-tag.outputs.should_run == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
