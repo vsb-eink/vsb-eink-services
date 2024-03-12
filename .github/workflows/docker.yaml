@@ -48,6 +48,10 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: echo "changed=true" >> "$GITHUB_OUTPUT" && echo "version=$(jq -r .version ${{matrix.package-path}}/package.json)" >> "$GITHUB_OUTPUT"
 
+      - name: Unify package version
+        id: unified-version
+        run: echo "version=${{ steps.check-version.outputs.version || steps.manual-version-override.outputs.version }}" >> "$GITHUB_OUTPUT"
+
       - name: Login to Github Registry
         if: steps.check-version.outputs.changed == 'true' || steps.manual-version-override.outputs.changed == 'true'
         uses: docker/login-action@v3
@@ -63,4 +67,4 @@ jobs:
           context: .
           push: true
           target: ${{ matrix.package-name }}
-          tags: vsb-eink/${{ matrix.package-name }}:latest,vsb-eink/${{ matrix.package-name }}:${{ steps.check-version.outputs.version }}
+          tags: vsb-eink/${{ matrix.package-name }}:latest,vsb-eink/${{ matrix.package-name }}:${{ steps.unified-version.outputs.version }}
