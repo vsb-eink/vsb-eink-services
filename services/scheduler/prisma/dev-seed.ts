@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/scheduler-client';
+import { PrismaClient } from '../src/generated/@prisma/scheduler-client/index.js';
 
 const prisma = new PrismaClient();
 

@@ -1,4 +1,4 @@
-import { PrismaClient, Scope, Role } from '@prisma/facade-client';
+import { PrismaClient, Scope, Role } from '../src/generated/@prisma/facade-client/index.js';
 import argon2 from 'argon2';
 
 const prisma = new PrismaClient();
