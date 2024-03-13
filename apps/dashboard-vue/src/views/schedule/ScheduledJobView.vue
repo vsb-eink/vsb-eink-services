@@ -86,7 +86,7 @@
 							<q-item-section>
 								<q-checkbox
 									v-if="localData"
-									:v-model="localData.disabled"
+									v-model="localData.disabled"
 									:true-value="false"
 									:false-value="true"
 								/>
