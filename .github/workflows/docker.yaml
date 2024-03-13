@@ -1,6 +1,7 @@
 name: Publish docker images
 
 on:
+  workflow_dispatch:
   push:
     tags: ["*/v**"]
 
@@ -33,7 +34,7 @@ jobs:
     steps:
       - name: Check if tag is ours
         id: check-tag
-        run: echo "should_run=${{ startsWith(github.ref_name, matrix.package-name) && 'true' || 'false' }}" >> $GITHUB_OUTPUT
+        run: echo "should_run=${{ (startsWith(github.ref_name, matrix.package-name) || github.event_name == 'workflow_dispatch') && 'true' || 'false' }}" >> $GITHUB_OUTPUT
 
       - name: Checkout
         if: steps.check-tag.outputs.should_run == 'true'
@@ -54,7 +55,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/vsb-eink/${{ matrix.package-name }}
           tags: |
-            type=semver,pattern={{version}}
+            type=match,pattern=\d.\d.\d
+            type=match,pattern=\d.\d
+            type=ref,event=branch
 
       - name: Build and push image
         if: steps.check-tag.outputs.should_run == 'true'
