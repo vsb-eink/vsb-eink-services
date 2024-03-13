@@ -1,5 +1,5 @@
 import { sep, join, dirname } from 'node:path';
-import { mkdir, rename, rm } from 'node:fs/promises';
+import { copyFile, mkdir, rename, rm, unlink } from 'node:fs/promises';
 
 import { FastifyPluginAsyncTypebox, Type } from '@fastify/type-provider-typebox';
 import FastifyMultiPart from '@fastify/multipart';
@@ -84,7 +84,7 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 			const files = await request.saveRequestFiles();
 
 			for (const file of files) {
-				await rename(file.filepath, join(fullPath, file.filename));
+				await copyFile(file.filepath, join(fullPath, file.filename));
 			}
 		}
 
@@ -125,7 +125,7 @@ export const filesRoutes: FastifyPluginAsyncTypebox = async function (app, opts)
 			reply.statusCode = 201;
 		}
 
-		await rename(files[0].filepath, fullPath);
+		await copyFile(files[0].filepath, fullPath);
 
 		reply.statusCode = 201;
 		return readPathRecursive(fullPath, {
