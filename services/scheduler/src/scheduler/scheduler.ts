@@ -2,6 +2,7 @@ import { TimerBasedCronScheduler } from 'cron-schedule/schedulers/timer-based.js
 import Piscina from 'piscina';
 import { parseCronExpression } from 'cron-schedule';
 import { logger } from '../logger.js';
+import { WorkerInput } from './scheduler-worker.js';
 
 export function createScheduler() {
 	const scheduler = TimerBasedCronScheduler;
@@ -15,7 +16,7 @@ export function createScheduler() {
 	const eachMinuteInterval = scheduler.setInterval(
 		eachMinuteCron,
 		async () => {
-			await pool.run({ hasSeconds: false });
+			await pool.run({ precise: false } satisfies WorkerInput);
 		},
 		{ errorHandler: (err) => logger.error(err) },
 	);
@@ -24,7 +25,7 @@ export function createScheduler() {
 	const eachSecondInterval = scheduler.setInterval(
 		eachSecondCron,
 		async () => {
-			await pool.run({ hasSeconds: true });
+			await pool.run({ precise: true } satisfies WorkerInput);
 		},
 		{ errorHandler: (err) => logger.error(err) },
 	);
