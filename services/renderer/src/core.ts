@@ -76,7 +76,9 @@ class EInkRendererCore {
 			}
 
 			context = await this.browser.newContext({});
-			context.on('console', (message_) => logger.info(`Browser console: ${message_.text()}`));
+			context.on('console', (message_) =>
+				logger.debug(`Browser console: ${message_.text()}`),
+			);
 
 			const page = await context.newPage();
 			await page.setViewportSize({ width: 1200, height: 825 });
