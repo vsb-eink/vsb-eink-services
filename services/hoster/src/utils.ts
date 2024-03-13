@@ -3,6 +3,7 @@ import { PathLike } from 'node:fs';
 import { basename, dirname, join, sep } from 'node:path';
 
 import { FastifyRequest } from 'fastify';
+import { USER_CONTENT_PATH } from './environment.js';
 
 export async function pathExists(path: PathLike): Promise<boolean> {
 	try {
@@ -46,7 +47,7 @@ export interface SimpleDirentDirectory extends SimpleDirent {
 }
 
 export function stripRoot(path: PathLike) {
-	return path.toString().split(sep).slice(1).join(sep);
+	return path.toString().replace(USER_CONTENT_PATH, '').split(sep).splice(1).join('/');
 }
 
 export async function readPathRecursive(
