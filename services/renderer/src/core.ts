@@ -1,4 +1,4 @@
-import { Browser, BrowserContext } from 'playwright';
+import { Browser, BrowserContext, errors } from 'playwright';
 
 import { AbstractMessageBroker } from './message-broker.js';
 import { logger } from './logger.js';
@@ -80,7 +80,14 @@ class EInkRendererCore {
 
 			const page = await context.newPage();
 			await page.setViewportSize({ width: 1200, height: 825 });
-			await page.goto(contentUrl, { waitUntil: 'networkidle' });
+
+			try {
+				await page.goto(contentUrl, { waitUntil: 'networkidle' });
+			} catch (error) {
+				if (error instanceof errors.TimeoutError) {
+					logger.warn(`Timeout error: ${error.message}`);
+				}
+			}
 
 			const screenshot = await page.screenshot({
 				type: 'png',
