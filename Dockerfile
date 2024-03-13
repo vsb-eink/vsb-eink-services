@@ -39,6 +39,7 @@ COPY --from=build-dashboard-vue /prod/dashboard-vue/.env.example /opt/env/
 COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/import-meta-env /opt/env/
 COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/templates /etc/nginx/templates
 COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/docker-entrypoint.d/* /docker-entrypoint.d
+RUN chmod +x /docker-entrypoint.d/*
 EXPOSE 80
 
 # ------ Compressor ------
