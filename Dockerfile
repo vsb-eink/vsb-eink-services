@@ -99,7 +99,7 @@ CMD [ "pnpm", "start" ]
 
 # ------ Renderer ------
 FROM runner-base as runner-base-playwright
-RUN pnpm dlx playwright@^1.41.1 install --with-deps chromium
+RUN pnpm dlx playwright@1.41.1 install --with-deps chromium
 
 FROM repo-with-deps AS build-renderer
 WORKDIR /usr/src/app
