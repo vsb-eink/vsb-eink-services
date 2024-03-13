@@ -25,7 +25,7 @@ export default async function ({ precise }: WorkerInput) {
 			precise,
 			disabled: false,
 		},
-		orderBy: [{ priority: 'asc' }, { target: 'asc' }],
+		orderBy: [{ priority: 'desc' }, { target: 'asc' }],
 	});
 
 	let lastTarget = '';
