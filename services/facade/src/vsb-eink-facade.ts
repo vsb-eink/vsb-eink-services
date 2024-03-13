@@ -5,9 +5,12 @@ import 'dotenv/config';
 import { createServer } from './server.js';
 import { API_HOST, API_PORT } from './environment.js';
 import { createSyncWorker } from './sync.js';
+import { ensureDatabaseHasAdminSetup } from './database.js';
 
 const server = createServer({ logger: { level: 'warn' } });
 const syncWorker = createSyncWorker();
+
+await ensureDatabaseHasAdminSetup();
 
 await server.listen({
 	host: API_HOST,

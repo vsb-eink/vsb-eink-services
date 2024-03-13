@@ -1,7 +1,9 @@
-import { PrismaClient, Prisma } from './generated/@prisma/facade-client/index.js';
+import { PrismaClient, Prisma, Role } from './generated/@prisma/facade-client/index.js';
 export * from './generated/@prisma/facade-client/index.js';
 
 import { events } from './events.js';
+import argon2 from 'argon2';
+import { DEFAULT_ADMIN_PASSWORD } from './environment.js';
 
 type PanelOperations = keyof (typeof db)['panel'];
 
@@ -36,6 +38,19 @@ export const db = new PrismaClient().$extends({
 		},
 	},
 });
+
+export async function ensureDatabaseHasAdminSetup() {
+	const admin = await db.user.findFirst({ where: { role: 'ADMIN' } });
+	if (admin) return;
+
+	await db.user.create({
+		data: {
+			username: 'admin',
+			role: Role.ADMIN,
+			password: await argon2.hash(DEFAULT_ADMIN_PASSWORD),
+		},
+	});
+}
 
 export function isDatabaseError(error: unknown): error is Prisma.PrismaClientKnownRequestError {
 	return error instanceof Prisma.PrismaClientKnownRequestError;
