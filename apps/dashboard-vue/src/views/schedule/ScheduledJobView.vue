@@ -81,6 +81,21 @@
 
 						<q-item>
 							<q-item-section>
+								<q-item-label>Aktivní</q-item-label>
+							</q-item-section>
+							<q-item-section>
+								<q-checkbox
+									v-if="localData"
+									:v-model="localData.disabled"
+									:true-value="false"
+									:false-value="true"
+								/>
+								<q-skeleton v-else></q-skeleton>
+							</q-item-section>
+						</q-item>
+
+						<q-item>
+							<q-item-section>
 								<q-item-label>Priorita</q-item-label>
 							</q-item-section>
 							<q-item-section>
