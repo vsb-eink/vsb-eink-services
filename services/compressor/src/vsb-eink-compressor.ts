@@ -55,7 +55,6 @@ mqtt.on('message', async (topic, payload) => {
 				: `image/${extension}`;
 
 		if (!isSupportedMimeType(mimeType)) {
-			console.error(`Unsupported image type: ${extension}`);
 			return;
 		}
 
