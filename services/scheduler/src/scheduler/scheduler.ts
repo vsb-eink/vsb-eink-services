@@ -4,34 +4,29 @@ import { parseCronExpression } from 'cron-schedule';
 import { logger } from '../logger.js';
 import { WorkerInput } from './scheduler-worker.js';
 
-export function createScheduler() {
+export interface SchedulerOptions {
+	maxWorkers?: number;
+	maxQueue?: number;
+}
+
+export function createScheduler({ maxWorkers = 4, maxQueue = 1 }: SchedulerOptions = {}) {
 	const scheduler = TimerBasedCronScheduler;
 	const pool = new Piscina({
 		filename: new URL(`scheduler-worker.js`, import.meta.url).href,
-		maxQueue: 1,
-		maxThreads: 4,
+		maxQueue,
+		maxThreads: maxWorkers,
 	});
-
-	const eachMinuteCron = parseCronExpression('* * * * *');
-	const eachMinuteInterval = scheduler.setInterval(
-		eachMinuteCron,
-		async () => {
-			await pool.run({ precise: false } satisfies WorkerInput);
-		},
-		{ errorHandler: (err) => logger.error(err) },
-	);
 
 	const eachSecondCron = parseCronExpression('* * * * * *');
 	const eachSecondInterval = scheduler.setInterval(
 		eachSecondCron,
 		async () => {
-			await pool.run({ precise: true } satisfies WorkerInput);
+			await pool.run({});
 		},
 		{ errorHandler: (err) => logger.error(err) },
 	);
 
 	const stopScheduler = async () => {
-		scheduler.clearTimeoutOrInterval(eachMinuteInterval);
 		scheduler.clearTimeoutOrInterval(eachSecondInterval);
 		await pool.destroy();
 	};

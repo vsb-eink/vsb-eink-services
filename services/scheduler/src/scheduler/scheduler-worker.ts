@@ -7,7 +7,7 @@ import { MQTT_URL } from '../environment.js';
 import { createDatabaseClient } from '../database.js';
 
 export interface WorkerInput {
-	precise: boolean;
+	precise?: boolean;
 }
 
 logger.info(`Loading prisma client`);
@@ -19,13 +19,14 @@ const mqtt = await connectAsync(MQTT_URL, {
 
 export default async function ({ precise }: WorkerInput) {
 	const now = new Date();
+	now.setMilliseconds(0);
 
 	const jobs = await db.eInkJob.findMany({
 		where: {
 			precise,
 			disabled: false,
 		},
-		orderBy: [{ priority: 'desc' }, { target: 'asc' }],
+		orderBy: [{ precise: 'asc' }, { priority: 'desc' }, { target: 'asc' }],
 	});
 
 	let lastTarget = '';
@@ -59,6 +60,11 @@ export default async function ({ precise }: WorkerInput) {
 
 			const isCyclable = job.shouldCycle;
 			if (isCyclable) {
+				logger.debug(
+					`Publishing ${job.command} for ${job.target} with ${
+						commandArguments[0]
+					} because ${job.cron} matches ${now.toISOString()}`,
+				);
 				await mqtt.publishAsync(
 					getTopic(job.target, job.command),
 					commandArguments[job.cycle % commandArguments.length],
@@ -72,6 +78,11 @@ export default async function ({ precise }: WorkerInput) {
 			}
 
 			// TODO: Find a more universal way to handle this
+			logger.debug(
+				`Publishing ${job.command} for ${job.target} with ${commandArguments[0]} because ${
+					job.cron
+				} matches ${now.toISOString()}`,
+			);
 			await mqtt.publishAsync(getTopic(job.target, job.command), commandArguments[0]);
 			skip = true;
 		}
