@@ -60,6 +60,7 @@ class EInkRendererCore {
 		const [type, mode] = action.split('_');
 
 		let context: BrowserContext | undefined;
+		console.time('render');
 		try {
 			const contentUrl =
 				type === 'url'
@@ -75,16 +76,15 @@ class EInkRendererCore {
 				}
 			}
 
-			context = await this.browser.newContext({});
+			context = await this.browser.newContext({ viewport: { width: 1200, height: 825 } });
 			context.on('console', (message_) =>
 				logger.debug(`Browser console: ${message_.text()}`),
 			);
 
 			const page = await context.newPage();
-			await page.setViewportSize({ width: 1200, height: 825 });
 
 			try {
-				await page.goto(contentUrl, { waitUntil: 'networkidle' });
+				await page.goto(contentUrl);
 			} catch (error) {
 				if (error instanceof errors.TimeoutError) {
 					logger.warn(`Timeout error: ${error.message}`);
@@ -95,6 +95,7 @@ class EInkRendererCore {
 				type: 'png',
 				animations: 'disabled',
 				scale: 'css',
+				caret: 'initial',
 			});
 
 			await this.broker.publish(`vsb-eink/${target}/display/png_${mode}/set`, screenshot);
@@ -102,6 +103,7 @@ class EInkRendererCore {
 			logger.error(`Failed to render HTML: ${error}`);
 		} finally {
 			await context?.close();
+			console.timeEnd('render');
 		}
 	}
 }
