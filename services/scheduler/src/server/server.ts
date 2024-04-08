@@ -1,4 +1,4 @@
-import Fastify, { FastifyServerOptions } from 'fastify';
+import Fastify, { FastifyServerOptions, RouteOptions } from 'fastify';
 import FastifySensible from '@fastify/sensible';
 import FastifyPrintRoutes from 'fastify-print-routes';
 import FastifySwagger from '@fastify/swagger';
@@ -9,7 +9,10 @@ import { apiRoutes } from './routes/api/index.js';
 export async function createServer(opts?: FastifyServerOptions) {
 	const app = Fastify(opts);
 
-	await app.register(FastifyPrintRoutes, { compact: true });
+	await app.register(FastifyPrintRoutes, {
+		compact: true,
+		filter: (route: RouteOptions) => !route.url.startsWith('/openapi'),
+	});
 	await app.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 
 	await app.register(apiRoutes, { prefix: '/' });
