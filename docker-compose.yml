@@ -1,0 +1,103 @@
+services:
+  dashboard:
+    image: ghcr.io/vsb-eink/dashboard-vue:main
+    ports:
+      - 8080:80
+    environment:
+      MQTT_HOST: mqtt-broker
+      FACADE_URL: http://localhost:3000
+    restart: unless-stopped
+
+  compressor:
+    image: ghcr.io/vsb-eink/compressor:main
+    environment:
+      MQTT_HOST: mqtt-broker
+    restart: unless-stopped
+    depends_on:
+      - mqtt-broker
+
+  facade:
+    image: ghcr.io/vsb-eink/facade:main
+    environment:
+      DEFAULT_ADMIN_PASSWORD: hunter2
+      DATABASE_URL: postgresql://postgres:hunter2@facade-db:5432/facade
+      JWT_SECRET: hunter2
+      GROUPER_URL: http://grouper:3000
+      HOSTER_URL: http://hoster:3000
+      SCHEDULER_URL: http://scheduler:3000
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    depends_on:
+      facade-db:
+        condition: service_healthy
+
+  grouper:
+    image: ghcr.io/vsb-eink/grouper:main
+    volumes:
+      - grouper-data:/var/lib/grouper
+    environment:
+      MQTT_HOST: mqtt-broker
+      DATABASE_URL: file:/var/lib/grouper/grouper.db
+    restart: unless-stopped
+    depends_on:
+      - mqtt-broker
+
+  hoster:
+    image: ghcr.io/vsb-eink/hoster:main
+    volumes:
+      - hoster-data:/var/lib/hoster/public
+    environment:
+      USER_CONTENT_PATH: /var/lib/hoster/public
+    restart: unless-stopped
+
+  renderer:
+    image: ghcr.io/vsb-eink/renderer:main
+    environment:
+      MQTT_HOST: mqtt-broker
+    restart: unless-stopped
+    depends_on:
+      - mqtt-broker
+
+  scheduler:
+    image: ghcr.io/vsb-eink/scheduler:main
+    volumes:
+      - scheduler-data:/var/lib/scheduler
+    environment:
+      MQTT_HOST: mqtt-broker
+      DATABASE_URL: file:/var/lib/scheduler/scheduler.db
+    restart: unless-stopped
+    depends_on:
+      - mqtt-broker
+
+  facade-db:
+    image: docker.io/postgres:16
+    volumes:
+      - facade-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: hunter2
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  mqtt-broker:
+    image: eclipse-mosquitto:2
+    configs:
+      - source: mosquitto.conf
+        target: /mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+
+volumes:
+  facade-db-data:
+  hoster-data:
+  scheduler-data:
+  grouper-data:
+
+configs:
+  mosquitto.conf:
+    content: |
+      listener 1883 0.0.0.0
+      allow_anonymous true
