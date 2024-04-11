@@ -4,7 +4,6 @@ services:
     ports:
       - 8080:80
     environment:
-      MQTT_HOST: mqtt-broker
       FACADE_URL: http://localhost:3000
     restart: unless-stopped
 
