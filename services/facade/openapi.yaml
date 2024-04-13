@@ -429,7 +429,6 @@ components:
           type: boolean
         disabled:
           type: boolean
-
   parameters:
     path:
       name: path
@@ -503,6 +502,33 @@ components:
         '*/*':
           schema:
             $ref: '#/components/schemas/UnknownType'
+    HealthyStatusResponse:
+      description: Health Check Succeeded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                default: 'ok'
+            required: [status]
+    UnhealthyStatusResponse:
+      description: Health Check Failed
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/HttpError'
+              - required: [code, error, message, statusCode]
+    HealthCheckErrorResponse:
+      description: Error Performing Health Check
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/HttpError'
+              - required: [message, statusCode]
   requestBodies:
     UnknownRequestBody:
       content:
@@ -510,6 +536,18 @@ components:
           schema:
             $ref: '#/components/schemas/UnknownType'
 paths:
+  /status:
+    get:
+      operationId: getStatus
+      tags: [status]
+      responses:
+        '200':
+          $ref: '#/components/responses/HealthyStatusResponse'
+        '503':
+          $ref: '#/components/responses/UnhealthyStatusResponse'
+        '500':
+            $ref: '#/components/responses/HealthCheckErrorResponse'
+
   /auth/login:
     post:
       operationId: login

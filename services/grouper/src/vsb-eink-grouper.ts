@@ -4,6 +4,7 @@ import 'dotenv/config';
 
 import Fastify from 'fastify';
 import FastifySensible from '@fastify/sensible';
+import FastifyUnderPressure from '@fastify/under-pressure';
 import { connectAsync } from 'mqtt';
 
 import { API_HOST, API_PORT, MQTT_URL } from './env.js';
@@ -34,6 +35,7 @@ mqtt.on('message', async (topic, message) => {
 
 // Start HTTP server
 const httpServer = Fastify({ logger: true });
+httpServer.register(FastifyUnderPressure, { exposeStatusRoute: true });
 httpServer.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 httpServer.register(apiRouter, { prefix: '/' });
 await httpServer.listen({

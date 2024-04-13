@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc && shx cp -r src/generated dist/",
     "start": "prisma migrate deploy && node dist/vsb-eink-scheduler.js",
+    "healthcheck": "node dist/healthcheck.js",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "generate": "prisma generate"
@@ -32,7 +33,7 @@
     "eslint": "^8.56.0",
     "prettier": "^3.1.0",
     "shx": "^0.3.4",
-    "tsx": "^4.1.1",
+    "tsx": "^4.7.2",
     "typescript": "^5.2.2"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^3.0.0",
     "@fastify/type-provider-typebox": "^3.5.0",
+    "@fastify/under-pressure": "^8.3.0",
     "cron-schedule": "^4.0.0",
     "cron-validate": "^1.4.5",
     "date-fns": "^2.30.0",

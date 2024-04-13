@@ -40,6 +40,7 @@ COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/import-meta-env /opt/e
 COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/templates /etc/nginx/templates
 COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/docker-entrypoint.d/* /docker-entrypoint.d
 RUN chmod +x /docker-entrypoint.d/*
+HEALTHCHECK CMD wget -o /dev/null http://127.0.0.1/ || exit 1
 EXPOSE 80
 
 # ------ Compressor ------
@@ -67,6 +68,7 @@ FROM runner-base AS facade
 WORKDIR /app
 COPY --from=build-facade /prod/facade .
 EXPOSE 3000
+HEALTHCHECK CMD ["pnpm", "healthcheck"]
 CMD [ "pnpm", "start" ]
 
 # ------ Grouper ------
@@ -81,6 +83,7 @@ FROM runner-base AS grouper
 WORKDIR /app
 COPY --from=build-grouper /prod/grouper .
 EXPOSE 3000
+HEALTHCHECK CMD ["pnpm", "healthcheck"]
 CMD [ "pnpm", "start" ]
 
 # ------ Hoster ------
@@ -95,6 +98,7 @@ FROM runner-base as hoster
 WORKDIR /app
 COPY --from=build-hoster /prod/hoster .
 EXPOSE 3000
+HEALTHCHECK CMD ["pnpm", "healthcheck"]
 CMD [ "pnpm", "start" ]
 
 # ------ Renderer ------
@@ -125,4 +129,5 @@ FROM runner-base AS scheduler
 WORKDIR /app
 COPY --from=build-scheduler /prod/scheduler .
 EXPOSE 3000
+HEALTHCHECK CMD ["pnpm", "healthcheck"]
 CMD [ "pnpm", "start" ]

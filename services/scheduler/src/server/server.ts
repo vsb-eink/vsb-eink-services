@@ -3,11 +3,14 @@ import FastifySensible from '@fastify/sensible';
 import FastifyPrintRoutes from 'fastify-print-routes';
 import FastifySwagger from '@fastify/swagger';
 import FastifySwaggerUI from '@fastify/swagger-ui';
+import FastifyUnderPressure from '@fastify/under-pressure';
 
 import { apiRoutes } from './routes/api/index.js';
 
 export async function createServer(opts?: FastifyServerOptions) {
 	const app = Fastify(opts);
+
+	await app.register(FastifyUnderPressure, { exposeStatusRoute: true });
 
 	await app.register(FastifyPrintRoutes, {
 		compact: true,

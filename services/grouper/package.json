@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc && shx cp -r src/generated dist/",
     "dev": "tsx watch src/vsb-eink-grouper.ts",
+    "healthcheck": "node dist/healthcheck.js",
     "start": "prisma migrate deploy && node dist/vsb-eink-grouper.js",
     "generate": "prisma generate"
   },
@@ -30,12 +31,13 @@
     "@vsb-eink/tsconfig": "workspace:^",
     "prettier": "^3.1.0",
     "shx": "^0.3.4",
-    "tsx": "^4.5.0",
+    "tsx": "^4.7.2",
     "typescript": "^5.3.2"
   },
   "dependencies": {
     "@fastify/sensible": "^5.5.0",
     "@fastify/type-provider-typebox": "^3.6.0",
+    "@fastify/under-pressure": "^8.3.0",
     "dotenv": "^16.4.4",
     "env-var": "^7.4.1",
     "fastify": "^4.26.0",

@@ -6,6 +6,7 @@ import FastifyGuard from 'fastify-guard';
 import FastifyCors from '@fastify/cors';
 import FastifySwagger from '@fastify/swagger';
 import FastifySwaggerUI from '@fastify/swagger-ui';
+import FastifyUnderPressure from '@fastify/under-pressure';
 
 import { routes } from './routes/index.js';
 import { registerCustomSchemas } from './schemas.js';
@@ -13,6 +14,8 @@ import { JWT_SECRET } from './environment.js';
 
 export function createServer(opts?: FastifyServerOptions) {
 	const app = Fastify(opts);
+
+	app.register(FastifyUnderPressure, { exposeStatusRoute: true });
 
 	app.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 
