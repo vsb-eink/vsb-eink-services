@@ -24,7 +24,7 @@ export async function createServer(opts?: FastifyServerOptions) {
 		openapi: {
 			info: {
 				title: 'VSB EInk Scheduler Service',
-				version: '1.0.0',
+				version: '1.2.0',
 			},
 		},
 	});
