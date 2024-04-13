@@ -25,7 +25,7 @@
     "env-var": "^7.4.1",
     "mqtt": "^5.2.2",
     "mqtt-pattern": "^2.1.0",
-    "playwright": "^1.41.1",
+    "playwright": "1.41.1",
     "winston": "^3.11.0"
   },
   "devDependencies": {
