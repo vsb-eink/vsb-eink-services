@@ -1,6 +1,6 @@
 {
   "name": "@vsb-eink/renderer",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "bin": "./dist/vsb-eink-renderer.js",
   "main": "./src/vsb-eink-renderer.ts",
