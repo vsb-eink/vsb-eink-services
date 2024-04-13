@@ -5,13 +5,13 @@ services:
       - 8080:80
     environment:
       FACADE_URL: http://localhost:3000
-    restart: unless-stopped
+    restart: always
 
   compressor:
     image: ghcr.io/vsb-eink/compressor:main
     environment:
       MQTT_HOST: mqtt-broker
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mqtt-broker
 
@@ -26,7 +26,7 @@ services:
       SCHEDULER_URL: http://scheduler:3000
     ports:
       - 3000:3000
-    restart: unless-stopped
+    restart: always
     depends_on:
       facade-db:
         condition: service_healthy
@@ -38,7 +38,7 @@ services:
     environment:
       MQTT_HOST: mqtt-broker
       DATABASE_URL: file:/var/lib/grouper/grouper.db
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mqtt-broker
 
@@ -48,13 +48,13 @@ services:
       - hoster-data:/var/lib/hoster/public
     environment:
       USER_CONTENT_PATH: /var/lib/hoster/public
-    restart: unless-stopped
+    restart: always
 
   renderer:
     image: ghcr.io/vsb-eink/renderer:main
     environment:
       MQTT_HOST: mqtt-broker
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mqtt-broker
 
@@ -65,7 +65,7 @@ services:
     environment:
       MQTT_HOST: mqtt-broker
       DATABASE_URL: file:/var/lib/scheduler/scheduler.db
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mqtt-broker
 
@@ -80,14 +80,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
+    restart: always
 
   mqtt-broker:
     image: eclipse-mosquitto:2
     configs:
       - source: mosquitto.conf
         target: /mosquitto/config/mosquitto.conf
-    restart: unless-stopped
+    restart: always
 
 volumes:
   facade-db-data:
