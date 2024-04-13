@@ -24,7 +24,7 @@ await app.register(FastifySwagger, {
 	openapi: {
 		info: {
 			title: 'VSB EInk Hoster Service',
-			version: '1.0.0',
+			version: '1.1.0',
 		},
 	},
 });
