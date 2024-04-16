@@ -12,6 +12,7 @@
 			<q-card-section>
 				<q-table
 					flat
+					:loading="loading"
 					:columns="columns"
 					:pagination="pagination"
 					:rows="panels"
@@ -123,6 +124,7 @@ const columns: QTableColumn[] = [
 		field: '',
 	},
 ];
+const loading = ref(true);
 
 const openPanelForm = () => {
 	panelForm.id = '';
@@ -153,9 +155,12 @@ const deletePanel = async (panel: Panel) => {
 
 const pullData = async () => {
 	try {
+		loading.value = true;
 		panels.value = await api.panels.getPanels().then((res) => res.data);
 	} catch (error) {
 		notify({ message: 'Nepodařilo se načíst seznam panelů', color: 'negative' });
+	} finally {
+		loading.value = false;
 	}
 };
 

@@ -12,6 +12,7 @@
 			<q-card-section>
 				<q-table
 					flat
+					:loading="loading"
 					:grid="$q.screen.xs"
 					:rows="jobs"
 					:pagination="pagination"
@@ -113,6 +114,7 @@ const columns: QTableColumn<ScheduledJob>[] = [
 		field: '' as any,
 	},
 ];
+const loading = ref(true);
 
 const submitJobForm = async () => {
 	return router.push({ name: 'schedule-detail', params: { id: -1 } });
@@ -134,9 +136,12 @@ const onRowClick = (event: Event, job: ScheduledJob) => {
 
 const pullData = async () => {
 	try {
+		loading.value = true;
 		jobs.value = await api.schedule.getScheduledJobs().then((res) => res.data);
 	} catch (error) {
 		notify({ message: 'Nepodařilo se načíst seznam plánovaných úloh', color: 'negative' });
+	} finally {
+		loading.value = false;
 	}
 };
 

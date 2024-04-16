@@ -12,7 +12,7 @@
 			<q-card-section>
 				<q-table
 					flat
-					:loading="panelGroups.length === 0"
+					:loading="loading"
 					:pagination="panelGroupsPagination"
 					:columns="panelGroupsColumns"
 					:rows="panelGroups"
@@ -128,6 +128,7 @@ const panelGroupsColumns: QTableColumn[] = [
 		field: '',
 	},
 ];
+const loading = ref(true);
 
 const openPanelGroupForm = () => {
 	panelGroupForm.name = '';
@@ -170,12 +171,15 @@ const deletePanelGroup = async (panelGroup: PanelGroup) => {
 
 const pullData = async () => {
 	try {
+		loading.value = true;
 		panelGroups.value = await api.panels.getPanelGroups().then((res) => res.data);
 	} catch (error) {
 		notify({
 			message: 'Nepodařilo se načíst skupiny panelů',
 			color: 'negative',
 		});
+	} finally {
+		loading.value = false;
 	}
 };
 

@@ -24,7 +24,8 @@
 			</q-card-section>
 
 			<q-card-section>
-				<q-tree dense :nodes="files" node-key="path" label-key="name">
+				<q-linear-progress v-if="loading" indeterminate color="black" />
+				<q-tree v-else dense :nodes="files" node-key="path" label-key="name">
 					<template v-slot:default-header="prop">
 						<q-toolbar class="text-caption" @click.stop @keypress.stop>
 							<q-icon
@@ -86,12 +87,14 @@ import type { ContentMetadata, FileMetadata } from '@vsb-eink/facade-api-client'
 
 const { dialog, notify } = useQuasar();
 const files = ref<ContentMetadata[]>([]);
+const loading = ref(true);
 
 const clipboard = useClipboard();
 const uploadDialog = useFileDialog();
 
 const refresh = async () => {
 	try {
+		loading.value = true;
 		const res = await api.hosted.getContentMetadata('/');
 		if (res.data.type !== 'directory') {
 			notify({ message: 'Nelze zobrazit obsah kořenové složky', color: 'negative' });
@@ -100,6 +103,8 @@ const refresh = async () => {
 		files.value = res.data.children;
 	} catch (error) {
 		console.error(error);
+	} finally {
+		loading.value = false;
 	}
 };
 

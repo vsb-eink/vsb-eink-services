@@ -15,6 +15,7 @@
 					:columns="usersColumns"
 					:pagination="usersPagination"
 					:rows="users"
+					:loading="loading"
 					@rowClick="onRowClick"
 				>
 					<template v-slot:body-cell-groups="props">
@@ -131,6 +132,7 @@ const usersColumns: QTableColumn[] = [
 		field: '',
 	},
 ];
+const loading = ref(true);
 
 const openUserForm = () => {
 	userForm.username = '';
@@ -176,12 +178,15 @@ const deleteUser = async (user: User) => {
 
 const pullData = async () => {
 	try {
+		loading.value = true;
 		users.value = await api.users.getUsers().then((res) => res.data);
 	} catch (error) {
 		notify({
 			message: 'Nepodařilo se načíst uživatele',
 			color: 'negative',
 		});
+	} finally {
+		loading.value = false;
 	}
 };
 

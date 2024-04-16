@@ -12,7 +12,7 @@
 			<q-card-section>
 				<q-table
 					flat
-					:loading="userGroups.length === 0"
+					:loading="loading"
 					:pagination="userGroupsPagination"
 					:columns="userGroupsColumns"
 					:rows="userGroups"
@@ -120,6 +120,7 @@ const userGroupsColumns: QTableColumn[] = [
 		field: '',
 	},
 ];
+const loading = ref(true);
 
 const openUserGroupForm = () => {
 	userGroupForm.name = '';
@@ -150,9 +151,12 @@ const deleteUserGroup = async (userGroup: UserGroup) => {
 
 const pullData = async () => {
 	try {
+		loading.value = true;
 		userGroups.value = await api.users.getUserGroups().then((res) => res.data);
 	} catch (error) {
 		notify({ message: 'Nepodařilo se načíst skupiny', color: 'negative' });
+	} finally {
+		loading.value = false;
 	}
 };
 
