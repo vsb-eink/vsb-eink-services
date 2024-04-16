@@ -4,17 +4,18 @@ import { FastifyInstance } from 'fastify';
 
 export const EmptyBodySchema = Type.Null({ $id: 'EmptyBody' });
 export const HttpErrorSchema = Type.Ref('HttpError');
+export const IdentifierStringSchema = Type.String({ pattern: '^[a-zA-Z0-9_\\-.]+$' });
 
 export const LinkablePanelSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.Optional(Type.String()),
 	},
 	{ $id: 'LinkablePanel' },
 );
 export const LinkedPanelSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.String(),
 	},
 	{ $id: 'LinkedPanel' },
@@ -22,14 +23,14 @@ export const LinkedPanelSchema = Type.Object(
 
 export const LinkablePanelGroupSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.Optional(Type.String()),
 	},
 	{ $id: 'LinkablePanelGroup' },
 );
 export const LinkedPanelGroupSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.String(),
 	},
 	{ $id: 'LinkedPanelGroup' },
@@ -38,14 +39,14 @@ export const LinkedPanelGroupSchema = Type.Object(
 export const LinkableUserSchema = Type.Object(
 	{
 		id: Type.Number(),
-		username: Type.Optional(Type.String()),
+		username: Type.Optional(IdentifierStringSchema),
 	},
 	{ $id: 'LinkableUser' },
 );
 export const LinkedUserSchema = Type.Object(
 	{
 		id: Type.Number(),
-		username: Type.String(),
+		username: IdentifierStringSchema,
 	},
 	{ $id: 'LinkedUser' },
 );
@@ -71,7 +72,7 @@ export const ScopeSchema = Type.Enum(Scope, { $id: 'Scope' });
 export const UserSchema = Type.Object(
 	{
 		id: Type.Number(),
-		username: Type.String(),
+		username: IdentifierStringSchema,
 		role: Type.Ref(RoleSchema),
 		groups: Type.Array(Type.Ref(LinkedUserGroupSchema)),
 	},
@@ -80,7 +81,7 @@ export const UserSchema = Type.Object(
 
 export const InsertableUserSchema = Type.Object(
 	{
-		username: Type.String(),
+		username: IdentifierStringSchema,
 		role: Type.Optional(Type.Ref(RoleSchema)),
 		password: Type.String(),
 		groups: Type.Optional(Type.Array(Type.Ref(LinkableUserGroupSchema))),
@@ -90,7 +91,7 @@ export const InsertableUserSchema = Type.Object(
 
 export const UpdatableUserSchema = Type.Object(
 	{
-		username: Type.Optional(Type.String()),
+		username: Type.Optional(IdentifierStringSchema),
 		role: Type.Optional(Type.Ref(RoleSchema)),
 		password: Type.Optional(Type.String()),
 		groups: Type.Optional(Type.Array(Type.Ref(LinkableUserGroupSchema))),
@@ -100,7 +101,7 @@ export const UpdatableUserSchema = Type.Object(
 
 export const PanelGroupSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.String(),
 		panels: Type.Array(Type.Ref(LinkedPanelSchema)),
 		managedBy: Type.Array(Type.Ref(LinkedUserGroupSchema)),
@@ -110,7 +111,7 @@ export const PanelGroupSchema = Type.Object(
 
 export const InsertablePanelGroupSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.Optional(Type.String()),
 		panels: Type.Optional(Type.Array(Type.Ref(LinkablePanelSchema))),
 		managedBy: Type.Optional(Type.Array(Type.Ref(LinkableUserGroupSchema))),
@@ -120,7 +121,7 @@ export const InsertablePanelGroupSchema = Type.Object(
 
 export const UpdatablePanelGroupSchema = Type.Object(
 	{
-		id: Type.Optional(Type.String()),
+		id: Type.Optional(IdentifierStringSchema),
 		name: Type.Optional(Type.String()),
 		panels: Type.Optional(Type.Array(Type.Ref(LinkablePanelSchema))),
 		managedBy: Type.Optional(Type.Array(Type.Ref(LinkableUserGroupSchema))),
@@ -130,7 +131,7 @@ export const UpdatablePanelGroupSchema = Type.Object(
 
 export const PanelSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.String(),
 		groups: Type.Array(Type.Ref(LinkedPanelGroupSchema)),
 	},
@@ -139,7 +140,7 @@ export const PanelSchema = Type.Object(
 
 export const InsertablePanelSchema = Type.Object(
 	{
-		id: Type.String(),
+		id: IdentifierStringSchema,
 		name: Type.Optional(Type.String()),
 		groups: Type.Optional(Type.Array(Type.Ref(LinkablePanelGroupSchema))),
 	},
@@ -148,7 +149,7 @@ export const InsertablePanelSchema = Type.Object(
 
 export const UpdatablePanelSchema = Type.Object(
 	{
-		id: Type.Optional(Type.String()),
+		id: Type.Optional(IdentifierStringSchema),
 		name: Type.Optional(Type.String()),
 		groups: Type.Optional(Type.Array(Type.Ref(LinkablePanelGroupSchema))),
 	},
@@ -192,7 +193,7 @@ export const ScheduledJobSchema = Type.Object(
 		name: Type.String(),
 		description: Type.Union([Type.String(), Type.Null()]),
 		cron: Type.String(),
-		target: Type.String(),
+		target: IdentifierStringSchema,
 		command: Type.String(),
 		content: Type.Array(Type.String()),
 		precise: Type.Boolean(),

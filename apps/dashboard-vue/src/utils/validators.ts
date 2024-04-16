@@ -46,3 +46,17 @@ export const doesNotContainSpaces: Validator = (value: string) => {
 	}
 	return true;
 };
+
+export const isAlphaNumeric: Validator = (value: string) => {
+	if (!value.match(/^[a-zA-Z0-9]*$/)) {
+		return 'Řetězec může obsahovat pouze písmena, čísla a znaky ., -, _';
+	}
+	return true;
+};
+
+export const isLowerCase: Validator = (value: string) => {
+	if (value !== value.toLowerCase()) {
+		return 'Použijte pouze malá písmena';
+	}
+	return true;
+};

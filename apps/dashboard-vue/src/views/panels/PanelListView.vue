@@ -60,7 +60,7 @@
 						<q-input
 							v-model="panelForm.id"
 							label="ID panelu"
-							:rules="[isNotEmpty]"
+							:rules="[isNotEmpty, isAlphaNumeric, isLowerCase, doesNotContainSpaces]"
 						></q-input>
 						<q-input
 							v-model="panelForm.name"
@@ -87,7 +87,7 @@ import { useRouter } from 'vue-router';
 import { api } from '@/services/api';
 import type { Panel } from '@vsb-eink/facade-api-client';
 import { type QTableColumn, type QTableProps, useQuasar } from 'quasar';
-import { isNotEmpty } from '@/utils/validators';
+import { doesNotContainSpaces, isAlphaNumeric, isLowerCase, isNotEmpty } from '@/utils/validators';
 
 const router = useRouter();
 const { notify } = useQuasar();

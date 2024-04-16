@@ -60,7 +60,7 @@
 						<q-input
 							label="Přihlašovací jméno"
 							v-model="userForm.username"
-							:rules="[isNotEmpty, doesNotContainSpaces]"
+							:rules="[isNotEmpty, isAlphaNumeric, isLowerCase, doesNotContainSpaces]"
 						/>
 						<q-input
 							label="Heslo"
@@ -88,7 +88,7 @@ import { api } from '@/services/api';
 import { useRouter } from 'vue-router';
 import { type QTableColumn, type QTableProps, useQuasar } from 'quasar';
 import type { User } from '@vsb-eink/facade-api-client';
-import { doesNotContainSpaces, isNotEmpty } from '@/utils/validators';
+import { doesNotContainSpaces, isAlphaNumeric, isLowerCase, isNotEmpty } from '@/utils/validators';
 
 const router = useRouter();
 const { notify } = useQuasar();

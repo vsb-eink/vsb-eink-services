@@ -64,7 +64,7 @@
 						<q-input
 							v-model="panelGroupForm.id"
 							label="ID skupiny"
-							:rules="[isNotEmpty]"
+							:rules="[isNotEmpty, isAlphaNumeric, isLowerCase, doesNotContainSpaces]"
 						></q-input>
 						<q-input
 							v-model="panelGroupForm.name"
@@ -91,7 +91,7 @@ import { useRouter } from 'vue-router';
 import type { PanelGroup } from '@vsb-eink/facade-api-client';
 import { type QTableColumn, type QTableProps, useQuasar } from 'quasar';
 import { api } from '@/services/api';
-import { isNotEmpty } from '@/utils/validators';
+import { doesNotContainSpaces, isAlphaNumeric, isLowerCase, isNotEmpty } from '@/utils/validators';
 
 const router = useRouter();
 const { notify } = useQuasar();
