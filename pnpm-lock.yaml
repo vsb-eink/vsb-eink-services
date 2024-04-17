@@ -153,6 +153,8 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3
 
+  packages/healthcheck: {}
+
   packages/prettier-config: {}
 
   packages/tsconfig: {}
@@ -232,6 +234,9 @@ importers:
       '@sinclair/typebox':
         specifier: ^0.32.14
         version: 0.32.14
+      '@vsb-eink/healthcheck':
+        specifier: workspace:^
+        version: link:../../packages/healthcheck
       argon2:
         specifier: ^0.31.2
         version: 0.31.2
@@ -305,6 +310,9 @@ importers:
       '@fastify/under-pressure':
         specifier: ^8.3.0
         version: 8.3.0
+      '@vsb-eink/healthcheck':
+        specifier: workspace:^
+        version: link:../../packages/healthcheck
       dotenv:
         specifier: ^16.4.4
         version: 16.4.4
@@ -384,6 +392,9 @@ importers:
       '@sinclair/typebox':
         specifier: ^0.32.14
         version: 0.32.14
+      '@vsb-eink/healthcheck':
+        specifier: workspace:^
+        version: link:../../packages/healthcheck
       '@vsb-eink/tsconfig':
         specifier: workspace:^
         version: link:../../packages/tsconfig
@@ -482,6 +493,9 @@ importers:
       '@fastify/under-pressure':
         specifier: ^8.3.0
         version: 8.3.0
+      '@vsb-eink/healthcheck':
+        specifier: workspace:^
+        version: link:../../packages/healthcheck
       cron-schedule:
         specifier: ^4.0.0
         version: 4.0.0

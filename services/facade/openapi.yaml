@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: VSB EInk Facade Service API
-  version: 1.0.0
+  version: 2.0.0
   description: An API for managing panels, users, and schedules in the VSB EInk Facade Service.
 
 servers:
@@ -536,10 +536,10 @@ components:
           schema:
             $ref: '#/components/schemas/UnknownType'
 paths:
-  /status:
+  /health:
     get:
-      operationId: getStatus
-      tags: [status]
+      operationId: checkHealth
+      tags: [health]
       responses:
         '200':
           $ref: '#/components/responses/HealthyStatusResponse'

@@ -15,7 +15,7 @@ import { JWT_SECRET } from './environment.js';
 export function createServer(opts?: FastifyServerOptions) {
 	const app = Fastify(opts);
 
-	app.register(FastifyUnderPressure, { exposeStatusRoute: true });
+	app.register(FastifyUnderPressure, { exposeStatusRoute: { routeOpts: {}, url: '/health' } });
 
 	app.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 

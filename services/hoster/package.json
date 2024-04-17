@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"start": "tsx src/vsb-eink-hoster.ts",
-		"healthcheck": "tsx src/healthcheck.ts",
+		"healthcheck": "healthcheck",
 		"dev": "tsx watch src/vsb-eink-hoster.ts"
 	},
 	"files": [
@@ -32,6 +32,7 @@
 		"@fastify/type-provider-typebox": "^4.0.0",
 		"@fastify/under-pressure": "^8.3.0",
 		"@sinclair/typebox": "^0.32.14",
+		"@vsb-eink/healthcheck": "workspace:^",
 		"@vsb-eink/tsconfig": "workspace:^",
 		"axios": "^1.6.7",
 		"dotenv": "^16.4.4",

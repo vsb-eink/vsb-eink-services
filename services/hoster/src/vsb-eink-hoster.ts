@@ -14,7 +14,7 @@ import { coreRoutes } from './routes/core.js';
 import { userRoutes } from './routes/user.js';
 
 const app = Fastify({ logger: true });
-await app.register(FastifyUnderPressure, { exposeStatusRoute: true });
+await app.register(FastifyUnderPressure, { exposeStatusRoute: { routeOpts: {}, url: '/health' } });
 await app.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 await app.register(FastifyPrintRoutes);
 await app.register(coreRoutes, { prefix: '/core' });

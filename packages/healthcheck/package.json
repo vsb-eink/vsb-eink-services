@@ -1,0 +1,12 @@
+{
+  "name": "@vsb-eink/healthcheck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "healthcheck.cjs",
+  "bin": {
+    "healthcheck": "healthcheck.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -49,7 +49,7 @@ mqtt.on('message', async (topic, message) => {
 
 // Start HTTP server
 const httpServer = Fastify({ logger: true });
-httpServer.register(FastifyUnderPressure, { exposeStatusRoute: true });
+httpServer.register(FastifyUnderPressure, { exposeStatusRoute: { routeOpts: {}, url: '/health' } });
 httpServer.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 httpServer.register(apiRouter, { prefix: '/' });
 await httpServer.listen({

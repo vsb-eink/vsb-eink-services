@@ -10,7 +10,9 @@ import { apiRoutes } from './routes/api/index.js';
 export async function createServer(opts?: FastifyServerOptions) {
 	const app = Fastify(opts);
 
-	await app.register(FastifyUnderPressure, { exposeStatusRoute: true });
+	await app.register(FastifyUnderPressure, {
+		exposeStatusRoute: { routeOpts: {}, url: '/health' },
+	});
 
 	await app.register(FastifyPrintRoutes, {
 		compact: true,
