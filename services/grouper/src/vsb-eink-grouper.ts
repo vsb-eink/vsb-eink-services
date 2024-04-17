@@ -11,13 +11,27 @@ import { API_HOST, API_PORT, MQTT_URL } from './env.js';
 import { apiRouter } from './routes/index.js';
 import { db } from './database.js';
 
+const TOPICS = [
+	'vsb-eink/+/display/raw_1bpp/set',
+	'vsb-eink/+/display/raw_4bpp/set',
+	'vsb-eink/+/display/get',
+	'vsb-eink/+/reboot/set',
+	'vsb-eink/+/firmware/update/set',
+	'vsb-eink/+/config/set',
+];
+
 // Subscribe to MQTT topics
 const mqtt = await connectAsync(MQTT_URL);
-await mqtt.subscribeAsync('vsb-eink/+/display/raw_1bpp/set');
-await mqtt.subscribeAsync('vsb-eink/+/display/raw_4bpp/set');
+for (const topic of TOPICS) {
+	await mqtt.subscribeAsync(topic);
+}
 
 mqtt.on('message', async (topic, message) => {
-	const [prefix, target, command, format, ...rest] = topic.split('/');
+	const [, prefix, target, command] = /^([^/]+)\/([^/]+)\/(.+)$/.exec(topic) ?? [];
+
+	if (!prefix || !target || !command) {
+		return;
+	}
 
 	const existingGroup = await db.group.findUnique({
 		where: { id: target },
@@ -29,7 +43,7 @@ mqtt.on('message', async (topic, message) => {
 
 	const panelsInGroup = existingGroup.panels ?? [];
 	for (const panel of panelsInGroup) {
-		await mqtt.publishAsync(`vsb-eink/${panel.id}/display/${format}/set`, message);
+		await mqtt.publishAsync(`${prefix}/${panel.id}/${command}`, message);
 	}
 });
 
