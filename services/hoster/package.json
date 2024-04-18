@@ -38,7 +38,7 @@
 		"dotenv": "^16.4.4",
 		"env-var": "^7.4.1",
 		"fastify": "^4.26.0",
-		"fastify-print-routes": "^3.1.0",
+		"pino": "^8.20.0",
 		"tsx": "^4.7.2"
 	}
 }

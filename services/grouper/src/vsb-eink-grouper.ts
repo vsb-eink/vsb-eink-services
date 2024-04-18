@@ -10,6 +10,7 @@ import { connectAsync } from 'mqtt';
 import { API_HOST, API_PORT, MQTT_URL } from './env.js';
 import { apiRouter } from './routes/index.js';
 import { db } from './database.js';
+import { logger } from './logger.js';
 
 const TOPICS = [
 	'vsb-eink/+/display/raw_1bpp/set',
@@ -48,7 +49,7 @@ mqtt.on('message', async (topic, message) => {
 });
 
 // Start HTTP server
-const httpServer = Fastify({ logger: true });
+const httpServer = Fastify({ logger });
 httpServer.register(FastifyUnderPressure, { exposeStatusRoute: { routeOpts: {}, url: '/health' } });
 httpServer.register(FastifySensible, { sharedSchemaId: 'HttpError' });
 httpServer.register(apiRouter, { prefix: '/' });

@@ -5,6 +5,7 @@ import { joinUrl } from './utils.js';
 import { GROUPER_URL, SCHEDULER_URL } from './environment.js';
 import { Static } from '@fastify/type-provider-typebox';
 import { ScheduledJobSchema } from './schemas.js';
+import { logger } from './logger.js';
 
 async function syncGrouper() {
 	const groups = await db.panelGroup.findMany({
@@ -53,8 +54,8 @@ export async function sync() {
 		syncScheduler(),
 	]);
 
-	console.log('Grouper sync result:', grouperResult.status);
-	console.log('Scheduler sync result:', schedulerResult.status);
+	logger.info('Grouper sync result:', grouperResult.status);
+	logger.info('Scheduler sync result:', schedulerResult.status);
 }
 
 export function createSyncWorker() {
@@ -83,11 +84,11 @@ export function createSyncWorker() {
 			}
 
 			syncInProgress = true;
-			console.log('State changed, syncing data with other services...');
+			logger.info('State changed, syncing data with other services...');
 			await sync();
 			dataToSync = false;
 			syncInProgress = false;
-			console.log('Data synced');
+			logger.info('Data synced');
 		}, ms);
 	};
 

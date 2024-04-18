@@ -13,7 +13,7 @@ logger.info(`Starting scheduler`);
 const { stopScheduler } = createScheduler();
 
 logger.info(`Setting http api handler`);
-const httpServer = await createServer();
+const httpServer = await createServer({ logger });
 await httpServer.listen({
 	port: API_PORT,
 	host: API_HOST,

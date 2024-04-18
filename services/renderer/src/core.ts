@@ -60,7 +60,7 @@ class EInkRendererCore {
 		const [type, mode] = action.split('_');
 
 		let context: BrowserContext | undefined;
-		console.time('render');
+		const renderStart = performance.now();
 		try {
 			const contentUrl =
 				type === 'url'
@@ -103,7 +103,7 @@ class EInkRendererCore {
 			logger.error(`Failed to render HTML: ${error}`);
 		} finally {
 			await context?.close();
-			console.timeEnd('render');
+			logger.info(`Rendering took ${performance.now() - renderStart}ms`);
 		}
 	}
 }

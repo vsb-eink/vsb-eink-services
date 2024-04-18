@@ -1,6 +1,6 @@
-import { createLogger, transports, format } from 'winston';
+import { pino } from 'pino';
+import { LOG_LEVEL } from './environment.js';
 
-export const logger = createLogger({
-	format: format.cli(),
-	transports: [new transports.Console()],
+export const logger = pino({
+	level: LOG_LEVEL,
 });

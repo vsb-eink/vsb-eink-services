@@ -13,17 +13,18 @@ import {
 	toRawInkplate10Buffer,
 } from './graphics/compress.js';
 import { fetchBuffer, fetchMimeType } from './utils/http.js';
+import { logger } from './logger.js';
 
-console.log(`Connecting to MQTT broker at ${MQTT_URL}`);
+logger.info(`Connecting to MQTT broker at ${MQTT_URL}`);
 const mqtt = await connectAsync(MQTT_URL);
-console.log(`Connected to MQTT broker at ${MQTT_URL}`);
+logger.info(`Connected to MQTT broker at ${MQTT_URL}`);
 
 // image types
 for (const type of SUPPORTED_EXTENSIONS) {
 	for (const mode of SUPPORTED_MODES) {
 		const topic = `vsb-eink/+/display/${type}_${mode}/set`;
 
-		console.log(`Subscribing to ${topic}`);
+		logger.info(`Subscribing to ${topic}`);
 		await mqtt.subscribeAsync(topic);
 	}
 }
@@ -32,16 +33,16 @@ for (const type of SUPPORTED_EXTENSIONS) {
 for (const mode of SUPPORTED_MODES) {
 	const topic = `vsb-eink/+/display/url_${mode}/set`;
 
-	console.log(`Subscribing to ${topic}`);
+	logger.info(`Subscribing to ${topic}`);
 	await mqtt.subscribeAsync(topic);
 }
 
 // incoming messages
 mqtt.on('message', async (topic, payload) => {
-	console.log(`Received message on ${topic}`);
+	logger.info(`Received message on ${topic}`);
 
 	if (payload.length === 0) {
-		console.error('Payload is empty, skipping');
+		logger.error('Payload is empty, skipping');
 		return;
 	}
 
@@ -59,19 +60,19 @@ mqtt.on('message', async (topic, payload) => {
 		}
 
 		if (!isSupportedMode(mode)) {
-			console.error(`Unsupported mode: ${mode}`);
+			logger.error(`Unsupported mode: ${mode}`);
 			return;
 		}
 
 		const image = sharp(extension === 'url' ? await fetchBuffer(payload.toString()) : payload);
 		const compressed = await toRawInkplate10Buffer(image, mode);
 
-		console.log(`Compressed image to ${compressed.length} bytes`);
+		logger.info(`Compressed image to ${compressed.length} bytes`);
 
 		await mqtt.publishAsync(`vsb-eink/${target}/display/raw_${mode}/set`, compressed);
-		console.log(`Published message on vsb-eink/${target}/display/raw_${mode}/set`);
+		logger.info(`Published message on vsb-eink/${target}/display/raw_${mode}/set`);
 	} catch (error) {
-		console.error(`Failed to compress image: ${error}`);
-		console.trace(error);
+		logger.error(`Failed to compress image: ${error}`);
+		logger.trace(error);
 	}
 });
