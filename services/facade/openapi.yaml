@@ -295,7 +295,7 @@ components:
           type: string
           readOnly: true
       required: [id, name]
-    
+
     AuthenticatedUser:
       type: object
       properties:
@@ -314,7 +314,7 @@ components:
           items:
             $ref: '#/components/schemas/Scope'
       required: [id, username, role, groups, scopes]
-    
+
     FileMetadata:
       type: object
       properties:
@@ -346,7 +346,7 @@ components:
       oneOf:
         - $ref: '#/components/schemas/FileMetadata'
         - $ref: '#/components/schemas/DirectoryMetadata'
-    
+
     ScheduledJob:
       type: object
       properties:
@@ -377,7 +377,9 @@ components:
           type: boolean
         disabled:
           type: boolean
-      required: [ id, name, description, cron, target, command, content, precise, priority, cycle, shouldCycle, disabled]
+        oneShot:
+          type: boolean
+      required: [ id, name, description, cron, target, command, content, precise, priority, cycle, shouldCycle, disabled, oneShot]
     InsertableScheduledJob:
       type: object
       properties:
@@ -401,6 +403,8 @@ components:
         shouldCycle:
           type: boolean
         disabled:
+          type: boolean
+        oneShot:
           type: boolean
       required: [name, cron, target, command]
     UpdatableScheduledJob:
@@ -428,6 +432,8 @@ components:
         shouldCycle:
           type: boolean
         disabled:
+          type: boolean
+        oneShot:
           type: boolean
   parameters:
     path:
@@ -494,7 +500,7 @@ components:
       schema:
         type: boolean
         default: false
-  
+
   responses:
     UnknownResponse:
       description: Unknown response

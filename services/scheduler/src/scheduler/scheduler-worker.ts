@@ -46,18 +46,22 @@ export default async function ({ precise }: WorkerInput) {
 		if (timeMatches) {
 			const commandArguments = JSON.parse(job.content);
 
+			// invalid job state
 			if (!Array.isArray(commandArguments)) {
 				logger.error(`Command arguments for job ${job.id} are not an array`);
 				continue;
 			}
 
+			// jobs without any arguments
 			const isEmpty = commandArguments.length === 0;
 			if (isEmpty) {
 				await mqtt.publishAsync(getTopic(job.target, job.command), '');
+				if (job.oneShot) await db.eInkJob.delete({ where: { id: job.id } });
 				skip = true;
 				continue;
 			}
 
+			// cyclable jobs
 			const isCyclable = job.shouldCycle;
 			if (isCyclable) {
 				logger.debug(
@@ -69,21 +73,29 @@ export default async function ({ precise }: WorkerInput) {
 					getTopic(job.target, job.command),
 					commandArguments[job.cycle % commandArguments.length],
 				);
-				await db.eInkJob.update({
-					where: { id: job.id },
-					data: { cycle: { increment: 1 } },
-				});
+
+				// for one-shot jobs, delete the job after the last cycle
+				if (job.oneShot && job.cycle === commandArguments.length - 1) {
+					await db.eInkJob.delete({ where: { id: job.id } });
+				} else {
+					await db.eInkJob.update({
+						where: { id: job.id },
+						data: { cycle: { increment: 1 } },
+					});
+				}
 				skip = true;
 				continue;
 			}
 
 			// TODO: Find a more universal way to handle this
+			// jobs with a single argument
 			logger.debug(
 				`Publishing ${job.command} for ${job.target} with ${commandArguments[0]} because ${
 					job.cron
 				} matches ${now.toISOString()}`,
 			);
 			await mqtt.publishAsync(getTopic(job.target, job.command), commandArguments[0]);
+			if (job.oneShot) await db.eInkJob.delete({ where: { id: job.id } });
 			skip = true;
 		}
 	}

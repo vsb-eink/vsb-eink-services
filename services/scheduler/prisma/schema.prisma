@@ -21,6 +21,7 @@ model EInkJob {
   cycle       Int     @default(0)
   shouldCycle Boolean @default(false)
   disabled    Boolean @default(false)
+  oneShot     Boolean @default(false)
 
   @@unique([target, cron])
 }

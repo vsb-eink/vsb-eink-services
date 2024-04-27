@@ -201,6 +201,7 @@ export const ScheduledJobSchema = Type.Object(
 		cycle: Type.Integer(),
 		shouldCycle: Type.Boolean(),
 		disabled: Type.Boolean(),
+		oneShot: Type.Boolean()
 	},
 	{ $id: 'ScheduledJob' },
 );
@@ -217,6 +218,7 @@ export const UpdatableScheduledJobSchema = Type.Partial(
 		'cycle',
 		'shouldCycle',
 		'disabled',
+		'oneShot'
 	]),
 	{ $id: 'UpdatableScheduledJob' },
 );
@@ -235,6 +237,7 @@ export const InsertableScheduledJobSchema = Type.Intersect(
 				'priority',
 				'shouldCycle',
 				'disabled',
+				'oneShot'
 			]),
 		),
 	],

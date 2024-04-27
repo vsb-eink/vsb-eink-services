@@ -81,6 +81,16 @@
 
 						<q-item>
 							<q-item-section>
+								<q-item-label>Po provedení smazat</q-item-label>
+							</q-item-section>
+							<q-item-section>
+								<q-checkbox v-if="localData" v-model="localData.oneShot" />
+								<q-skeleton v-else></q-skeleton>
+							</q-item-section>
+						</q-item>
+
+						<q-item>
+							<q-item-section>
 								<q-item-label>Aktivní</q-item-label>
 							</q-item-section>
 							<q-item-section>
@@ -281,6 +291,7 @@ const getDefaults = (): ScheduledJob => ({
 	priority: 0,
 	disabled: false,
 	shouldCycle: false,
+	oneShot: false,
 });
 
 const pushData = async () => {
@@ -303,6 +314,7 @@ const pushData = async () => {
 					content: localData.value.content,
 					priority: localData.value.priority,
 					shouldCycle: localData.value.shouldCycle,
+					oneShot: localData.value.oneShot,
 				})
 				.then((res) => res.data);
 			await router.push({

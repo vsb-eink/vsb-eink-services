@@ -17,6 +17,7 @@ export const EInkJobSchema = Type.Object({
 	cycle: Type.Integer(),
 	shouldCycle: Type.Boolean(),
 	disabled: Type.Boolean(),
+	oneShot: Type.Boolean()
 });
 
 export const EInkJobSelectableSchema = EInkJobSchema;
@@ -33,6 +34,7 @@ export const EInkJobUpdatableSchema = Type.Partial(
 		'cycle',
 		'shouldCycle',
 		'disabled',
+		'oneShot'
 	]),
 );
 export const EInkJobBulkUpdatableSchema = Type.Array(
@@ -42,7 +44,7 @@ export const EInkJobBulkUpdatableSchema = Type.Array(
 export const EInkJobInsertableSchema = Type.Intersect([
 	Type.Pick(EInkJobSchema, ['name', 'cron', 'target', 'command']),
 	Type.Partial(
-		Type.Pick(EInkJobSchema, ['description', 'content', 'priority', 'shouldCycle', 'disabled']),
+		Type.Pick(EInkJobSchema, ['description', 'content', 'priority', 'shouldCycle', 'disabled', 'oneShot']),
 	),
 ]);
 
