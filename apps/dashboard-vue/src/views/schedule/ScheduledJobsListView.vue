@@ -20,7 +20,14 @@
 					@rowClick="onRowClick"
 				>
 					<template v-slot:item="props">
-						<StylableTableCardItem :props="props" />
+						<q-btn
+							:to="{ name: 'schedule-detail', params: { id: props.row.id } }"
+							class="full-width"
+							flat
+							padding="0"
+						>
+							<StylableTableCardItem :props="props" style="text-align: start" />
+						</q-btn>
 					</template>
 
 					<template v-slot:body-cell-actions="props">
