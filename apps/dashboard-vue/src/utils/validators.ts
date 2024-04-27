@@ -48,7 +48,7 @@ export const doesNotContainSpaces: Validator = (value: string) => {
 };
 
 export const isAlphaNumeric: Validator = (value: string) => {
-	if (!value.match(/^[a-zA-Z0-9]*$/)) {
+	if (!value.match(/^[a-zA-Z0-9.\-_]*$/)) {
 		return 'Řetězec může obsahovat pouze písmena, čísla a znaky ., -, _';
 	}
 	return true;
