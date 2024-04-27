@@ -22,7 +22,7 @@ COPY pnpm-lock.yaml ./
 COPY patches/ patches/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 COPY . .
-RUN pnpm install --offline
+RUN pnpm install --frozen-lockfile --prefer-offline
 
 # ------ Dashboard ------
 FROM repo-with-deps AS build-dashboard-vue
