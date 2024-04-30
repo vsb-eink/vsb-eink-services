@@ -96,5 +96,7 @@ export async function readPathRecursive(
 }
 
 export function extractWildcardParam(request: FastifyRequest) {
-	return request.url.replace(request.routeOptions.url.replace('*', ''), '');
+	const root = request.routeOptions.url.replace('*', '');
+	const path = new URL(request.url, 'https://not-exists.com').pathname;
+	return path.replace(root, '');
 }

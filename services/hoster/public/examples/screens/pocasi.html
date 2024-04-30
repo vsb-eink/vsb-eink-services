@@ -39,9 +39,9 @@
         document.getElementById('date-text').innerText = new Date().toLocaleString('cs-CZ');
 
         // RSS
-        const proxyUrl = '/core/proxy';
+        const proxyUrl = 'cors?url=';
         const rssUrl = 'https://rss-bridge.org/bridge01/?action=display&bridge=FeedMergeBridge&feed_name=VSB-EInk+Novinky&feed_1=https%3A%2F%2Fnitter.cz%2Fvsbtuo%2Frss&feed_2=https%3A%2F%2Finfo.sso.vsb.cz%2Fcz.vsb.edison.info.web%2Frss%3ForgUnitId%3D1&feed_3=&feed_4=&feed_5=&feed_6=&feed_7=&feed_8=&feed_9=&feed_10=&limit=&format=Json';
-        const rss = await fetch(`${proxyUrl}/${rssUrl}`).then(r => r.json());
+        const rss = await fetch(`${proxyUrl}${encodeURIComponent(rssUrl)}`).then(r => r.json());
         const rssWidget = document.getElementById('rss-widget');
         for (const item of rss.items.filter(item => item.content_text).slice(0, 3)) {
             const pubDate = new Date(item.date_modified).toLocaleDateString();
