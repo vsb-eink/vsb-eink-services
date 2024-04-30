@@ -84,7 +84,7 @@ class EInkRendererCore {
 			const page = await context.newPage();
 
 			try {
-				await page.goto(contentUrl);
+				await page.goto(contentUrl, { waitUntil: 'networkidle', timeout: 10_000 });
 			} catch (error) {
 				if (error instanceof errors.TimeoutError) {
 					logger.warn(`Timeout error: ${error.message}`);
