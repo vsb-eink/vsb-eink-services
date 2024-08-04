@@ -33,7 +33,7 @@ RUN pnpm -F dashboard-vue... run generate && \
     pnpm -F dashboard-vue exec pkg ./node_modules/@import-meta-env/cli/bin/import-meta-env.js --target node18-alpine-x64 --output nginx/import-meta-env && \
     pnpm -F dashboard-vue deploy --prod /prod/dashboard-vue
 
-FROM nginx:1.25-alpine-slim as dashboard-vue
+FROM nginx:1.25-alpine-slim AS dashboard-vue
 COPY --from=build-dashboard-vue /prod/dashboard-vue/dist /usr/share/nginx/html
 COPY --from=build-dashboard-vue /prod/dashboard-vue/.env.example /opt/env/
 COPY --from=build-dashboard-vue /prod/dashboard-vue/nginx/import-meta-env /opt/env/
@@ -87,22 +87,14 @@ HEALTHCHECK CMD ["pnpm", "healthcheck"]
 CMD [ "pnpm", "start" ]
 
 # ------ Hoster ------
-FROM repo-with-deps AS build-hoster
-WORKDIR /usr/src/app
-COPY --from=repo-with-deps /usr/src/app .
-RUN pnpm -F hoster... run generate && \
-    pnpm -F hoster... run build && \
-    pnpm -F hoster deploy --prod /prod/hoster
-
-FROM runner-base as hoster
-WORKDIR /app
-COPY --from=build-hoster /prod/hoster .
-EXPOSE 3000
-HEALTHCHECK CMD ["pnpm", "healthcheck"]
-CMD [ "pnpm", "start" ]
+FROM httpd:2.4 AS hoster
+RUN apt-get update && \
+    apt-get install nodejs python3 curl -y && \
+    rm -rf /var/lib/apt/lists/*
+COPY --from=repo-with-deps /usr/src/app/services/hoster/httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # ------ Renderer ------
-FROM runner-base as runner-base-playwright
+FROM runner-base AS runner-base-playwright
 RUN pnpm dlx playwright@1.41.1 install --with-deps chromium
 
 FROM repo-with-deps AS build-renderer

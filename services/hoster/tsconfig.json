@@ -1,7 +1,0 @@
-{
-  "extends": "@vsb-eink/tsconfig",
-  "compilerOptions": {
-    "outDir": "./dist"
-  },
-  "include": ["src/**/*"],
-}

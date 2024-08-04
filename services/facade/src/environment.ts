@@ -11,6 +11,8 @@ export const LOG_LEVEL = env
 export const DEFAULT_ADMIN_PASSWORD = env.get('DEFAULT_ADMIN_PASSWORD').required().asString();
 export const JWT_SECRET = env.get('JWT_SECRET').required().asString();
 
+export const HOSTED_CONTENT_PATH = env.get('HOSTED_CONTENT_PATH').default('public').asString();
+
 export const DATABASE_URL = env.get('DATABASE_URL').required().asUrlString();
 export const GROUPER_URL = env.get('GROUPER_URL').required().asUrlString();
 export const HOSTER_URL = env.get('HOSTER_URL').required().asUrlString();

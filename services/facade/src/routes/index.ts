@@ -5,7 +5,7 @@ import { panelGroupsRoutes } from './panel-groups.js';
 import { userGroupsRoutes } from './user-groups.js';
 import { usersRoutes } from './users.js';
 import { scheduleRoutes } from './schedule.js';
-import { hostedRoutes } from './hosted.js';
+import { hostedRoutes } from './hosted/index.js';
 import { authRoutes } from './auth.js';
 import { profileRoutes } from './profile.js';
 import { maintenanceRoutes } from './maintenance.js';

@@ -1,6 +1,6 @@
 services:
   dashboard:
-    image: ghcr.io/vsb-eink/dashboard-vue:main
+    image: vsb-eink/dashboard-vue:latest
     ports:
       - 8080:80
     environment:
@@ -8,7 +8,7 @@ services:
     restart: always
 
   compressor:
-    image: ghcr.io/vsb-eink/compressor:main
+    image: vsb-eink/compressor:latest
     environment:
       MQTT_HOST: mqtt-broker
     restart: always
@@ -16,23 +16,26 @@ services:
       - mqtt-broker
 
   facade:
-    image: ghcr.io/vsb-eink/facade:main
+    image: vsb-eink/facade:latest
     environment:
       DEFAULT_ADMIN_PASSWORD: hunter2
       DATABASE_URL: postgresql://postgres:hunter2@facade-db:5432/facade
       JWT_SECRET: hunter2
       GROUPER_URL: http://grouper:3000
-      HOSTER_URL: http://hoster:3000
+      HOSTER_URL: http://hoster:80
       SCHEDULER_URL: http://scheduler:3000
+      HOSTED_CONTENT_PATH: /mnt/hosted
     ports:
       - 3000:3000
+    volumes:
+      - hosted-data:/mnt/hosted
     restart: always
     depends_on:
       facade-db:
         condition: service_healthy
 
   grouper:
-    image: ghcr.io/vsb-eink/grouper:main
+    image: vsb-eink/grouper:latest
     volumes:
       - grouper-data:/var/lib/grouper
     environment:
@@ -43,15 +46,14 @@ services:
       - mqtt-broker
 
   hoster:
-    image: ghcr.io/vsb-eink/hoster:main
+    image: vsb-eink/hoster:latest
     volumes:
-      - hoster-data:/var/lib/hoster/public
-    environment:
-      USER_CONTENT_PATH: /var/lib/hoster/public
+      - $PWD/services/hoster/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - hosted-data:/usr/local/apache2/htdocs
     restart: always
 
   renderer:
-    image: ghcr.io/vsb-eink/renderer:main
+    image: vsb-eink/renderer:latest
     environment:
       MQTT_HOST: mqtt-broker
     restart: always
@@ -59,7 +61,7 @@ services:
       - mqtt-broker
 
   scheduler:
-    image: ghcr.io/vsb-eink/scheduler:main
+    image: vsb-eink/scheduler:latest
     volumes:
       - scheduler-data:/var/lib/scheduler
     environment:
@@ -91,7 +93,7 @@ services:
 
 volumes:
   facade-db-data:
-  hoster-data:
+  hosted-data:
   scheduler-data:
   grouper-data:
 

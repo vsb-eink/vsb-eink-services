@@ -1,0 +1,94 @@
+#!/usr/bin/env node
+
+class HttpResponse {
+    constructor(statusCode = 200, body = '', headers = {}) {
+        this.statusCode = statusCode;
+        this.headers = headers;
+        this.body = body;
+    }
+
+    setStatusCode(statusCode) {
+        this.statusCode = statusCode;
+        return this;
+    }
+
+    setHeaders(headers) {
+        this.headers = {...this.headers, ...headers};
+        return this;
+    }
+
+    setBody(body) {
+        this.body = body;
+        return this;
+    }
+
+    getHeader(key) {
+        for (const k in this.headers) {
+            if (k.toLowerCase() === key.toLowerCase()) {
+                return this.headers[k];
+            }
+        }
+        return undefined;
+    }
+
+    toRawResponse() {
+        let out = '';
+
+        if (this.getHeader('status') === undefined) {
+            this.headers['status'] = this.statusCode;
+        }
+
+        if (this.getHeader('content-type') === undefined) {
+            if (typeof this.body === 'object') {
+                this.headers['content-type'] = 'application/json';
+            } else {
+                this.headers['content-type'] = 'text/plain';
+            }
+        }
+
+        for (const key in this.headers) {
+            out += `${key.toLowerCase()}: ${this.headers[key]}\n`;
+        }
+
+        out += '\n';
+
+        if (typeof this.body === 'object') {
+            out += JSON.stringify(this.body);
+        } else {
+            out += this.body;
+        }
+
+        return out;
+    }
+}
+
+async function main() {
+    const querystring = require('node:querystring');
+    const QUERY_STRING = process.env.QUERY_STRING || '';
+
+    if (!QUERY_STRING) {
+        return new HttpResponse(400, { error: 'QUERY_STRING is not set' });
+    }
+
+    const query = querystring.parse(QUERY_STRING);
+
+    if (!query.url) {
+        return new HttpResponse(400, { error: 'url is not set' });
+    }
+
+    try {
+        const res = await fetch(query.url);
+        const body = await res.text();
+        const headers = Object.fromEntries(res.headers);
+        const status = res.status;
+        return new HttpResponse(status, body, headers);
+    } catch (err) {
+        return new HttpResponse(500, { error: err.message });
+    }
+}
+
+main().then((res) => {
+    console.log(res.toRawResponse());
+}).catch((err) => {
+    console.error(new HttpResponse(500, { error: err.message }).toRawResponse());
+});
