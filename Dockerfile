@@ -1,3 +1,7 @@
+ARG HOSTER_NODE_VERSION="20.17"
+ARG HOSTER_BUN_VERSION="1.1.27"
+ARG HOSTER_DENO_VERSION="2.0.0-rc.1"
+
 FROM node:21-slim AS builder-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -87,10 +91,19 @@ HEALTHCHECK CMD ["pnpm", "healthcheck"]
 CMD [ "pnpm", "start" ]
 
 # ------ Hoster ------
-FROM httpd:2.4 AS hoster
-RUN apt-get update && \
-    apt-get install nodejs python3 curl -y && \
-    rm -rf /var/lib/apt/lists/*
+FROM node:${HOSTER_NODE_VERSION} AS node-binary
+FROM oven/bun:${HOSTER_BUN_VERSION} AS bun-binary
+FROM denoland/deno:bin-${HOSTER_DENO_VERSION} AS deno-binary
+
+FROM httpd:bookworm AS hoster
+
+RUN apt-get update && apt-get install -y \
+      python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=node-binary /usr/local/bin/node /usr/local/bin/
+COPY --from=bun-binary /usr/local/bin/bun /usr/local/bin/
+COPY --from=deno-binary /deno /usr/local/bin/deno
 COPY --from=repo-with-deps /usr/src/app/services/hoster/httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # ------ Renderer ------
