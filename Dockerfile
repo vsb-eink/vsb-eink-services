@@ -35,7 +35,7 @@ COPY --from=repo-with-deps /usr/src/app .
 RUN pnpm -F dashboard-vue... run generate && \
     pnpm -F dashboard-vue... run build && \
     pnpm -F dashboard-vue exec pkg ./node_modules/@import-meta-env/cli/bin/import-meta-env.js --target node18-alpine-x64 --output nginx/import-meta-env && \
-    pnpm -F dashboard-vue deploy --prod /prod/dashboard-vue
+    pnpm -F dashboard-vue deploy --legacy --prod /prod/dashboard-vue
 
 FROM nginx:1.25-alpine-slim AS dashboard-vue
 COPY --from=build-dashboard-vue /prod/dashboard-vue/dist /usr/share/nginx/html
@@ -53,7 +53,7 @@ WORKDIR /usr/src/app
 COPY --from=repo-with-deps /usr/src/app .
 RUN pnpm -F compressor... run generate && \
     pnpm -F compressor... run build && \
-    pnpm -F compressor deploy --prod /prod/compressor
+    pnpm -F compressor deploy --legacy --prod /prod/compressor
 
 FROM runner-base AS compressor
 WORKDIR /app
@@ -66,7 +66,7 @@ WORKDIR /usr/src/app
 COPY --from=repo-with-deps /usr/src/app .
 RUN pnpm -F facade... run generate && \
     pnpm -F facade... run build && \
-    pnpm -F facade deploy --prod /prod/facade
+    pnpm -F facade deploy --legacy --prod /prod/facade
 
 FROM runner-base AS facade
 WORKDIR /app
@@ -81,7 +81,7 @@ WORKDIR /usr/src/app
 COPY --from=repo-with-deps /usr/src/app .
 RUN pnpm -F grouper... run generate && \
     pnpm -F grouper... run build && \
-    pnpm -F grouper deploy --prod /prod/grouper
+    pnpm -F grouper deploy --legacy --prod /prod/grouper
 
 FROM runner-base AS grouper
 WORKDIR /app
@@ -115,7 +115,7 @@ WORKDIR /usr/src/app
 COPY --from=repo-with-deps /usr/src/app .
 RUN pnpm -F renderer... run generate && \
     pnpm -F renderer... run build && \
-    pnpm -F renderer deploy --prod /prod/renderer
+    pnpm -F renderer deploy --legacy --prod /prod/renderer
 
 FROM runner-base-playwright AS renderer
 WORKDIR /app
@@ -128,7 +128,7 @@ WORKDIR /usr/src/app
 COPY --from=repo-with-deps /usr/src/app .
 RUN pnpm -F scheduler... run generate && \
     pnpm -F scheduler... run build && \
-    pnpm -F scheduler deploy --prod /prod/scheduler
+    pnpm -F scheduler deploy --legacy --prod /prod/scheduler
 
 FROM runner-base AS scheduler
 WORKDIR /app

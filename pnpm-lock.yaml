@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@openapitools/openapi-generator-cli@2.11.0':
-    hash: zvj6xf7smhzazobvu5crzn2zza
+    hash: df2135bfef841559daca2e9d7fc5fba9e1055cc1470801f84ad8d54b231123be
     path: patches/@openapitools__openapi-generator-cli@2.11.0.patch
 
 importers:
@@ -142,7 +142,7 @@ importers:
     devDependencies:
       '@openapitools/openapi-generator-cli':
         specifier: ^2.11.0
-        version: 2.11.0(patch_hash=zvj6xf7smhzazobvu5crzn2zza)
+        version: 2.11.0(patch_hash=df2135bfef841559daca2e9d7fc5fba9e1055cc1470801f84ad8d54b231123be)
       '@vsb-eink/prettier-config':
         specifier: workspace:^
         version: link:../prettier-config
@@ -4378,7 +4378,7 @@ snapshots:
       openapi-typescript: 5.4.1
       yargs: 17.7.2
 
-  '@openapitools/openapi-generator-cli@2.11.0(patch_hash=zvj6xf7smhzazobvu5crzn2zza)':
+  '@openapitools/openapi-generator-cli@2.11.0(patch_hash=df2135bfef841559daca2e9d7fc5fba9e1055cc1470801f84ad8d54b231123be)':
     dependencies:
       '@nestjs/axios': 3.0.1(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.6.5)(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nestjs/common': 10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)
@@ -5402,7 +5402,7 @@ snapshots:
       debug: 4.3.4
       enhanced-resolve: 5.15.0
       eslint: 8.56.0
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-plugin-import@2.29.1)(eslint@8.56.0))(eslint@8.56.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.2
@@ -5414,7 +5414,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.0(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-plugin-import@2.29.1)(eslint@8.56.0))(eslint@8.56.0):
+  eslint-module-utils@2.8.0(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -5435,7 +5435,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.56.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-plugin-import@2.29.1)(eslint@8.56.0))(eslint@8.56.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
       hasown: 2.0.0
       is-core-module: 2.13.1
       is-glob: 4.0.3
