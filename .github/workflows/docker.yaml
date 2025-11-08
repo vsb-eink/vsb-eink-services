@@ -1,47 +1,39 @@
-name: Publish docker images
+name: Build docker images
 
 on:
   workflow_dispatch:
-  push:
-    tags: ["*/v**"]
+    inputs:
+      image-name:
+        description: Docker image to be built
+        required: true
+        type: choice
+        options:
+          - vsb-eink/dashboard-vue
+          - vsb-eink/compressor
+          - vsb-eink/facade
+          - vsb-eink/grouper
+          - vsb-eink/hoster
+          - vsb-eink/renderer
+          - vsb-eink/scheduler
+      image-version:
+        description: Manually set image tag, defaults to branch name and latest
+        required: false
+        type: string
 
 env:
   REGISTRY: ghcr.io
 
 jobs:
   build-and-push:
-    strategy:
-      matrix:
-        include:
-          - package-name: dashboard-vue
-            package-path: apps/dashboard-vue
-          - package-name: compressor
-            package-path: services/compressor
-          - package-name: facade
-            package-path: services/facade
-          - package-name: grouper
-            package-path: services/grouper
-          - package-name: hoster
-            package-path: services/hoster
-          - package-name: renderer
-            package-path: services/renderer
-          - package-name: scheduler
-            package-path: services/scheduler
     runs-on: [ubuntu-latest]
     permissions:
       contents: read
       packages: write
     steps:
-      - name: Check if tag is ours
-        id: check-tag
-        run: echo "should_run=${{ (startsWith(github.ref_name, matrix.package-name) || github.event_name == 'workflow_dispatch') && 'true' || 'false' }}" >> $GITHUB_OUTPUT
-
       - name: Checkout
-        if: steps.check-tag.outputs.should_run == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Login to Github Registry
-        if: steps.check-tag.outputs.should_run == 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -50,18 +42,12 @@ jobs:
 
       - name: Extract metadata for Docker image
         id: metadata
-        if: steps.check-tag.outputs.should_run == 'true'
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/vsb-eink/${{ matrix.package-name }}
-          tags: |
-            type=match,pattern=\d.\d.\d
-            type=match,pattern=\d.\d
-            type=ref,event=branch
+          images: ${{ env.REGISTRY }}/vsb-eink/${{ inputs.image-name }}
 
       - name: Build and push image
-        if: steps.check-tag.outputs.should_run == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
