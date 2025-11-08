@@ -62,6 +62,6 @@ jobs:
         with:
           context: .
           push: true
-          target: ${{ matrix.image-name }}
+          target: ${{ inputs.image-name }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
