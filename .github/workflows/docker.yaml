@@ -53,7 +53,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/vsb-eink/${{ inputs.image-name }}
           tags: |
-            type=raw,value=${{ steps.package-version.outputs.PACKAGE_VERSION }}
+            type=raw,value=${{ steps.package-version.outputs.PACKAGE_VERSION }},enable={{is_default_branch}}
+            type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
             type=sha
 
