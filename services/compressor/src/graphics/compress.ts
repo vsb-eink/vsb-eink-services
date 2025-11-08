@@ -66,7 +66,7 @@ export async function toRaw1bpp(image: ImageData): Promise<Buffer> {
 }
 
 export async function toRaw4bpp(image: ImageData): Promise<Buffer> {
-	const dithered = floydSteinberg(image, createLinearQuantiser(8));
+	const dithered = floydSteinberg(image, createLinearQuantiser(7));
 	changeDepth(dithered, 3);
 
 	const buffer = Buffer.alloc(dithered.data.length / 2);
