@@ -1,4 +1,4 @@
-name: Build docker images
+name: Build docker image
 
 on:
   workflow_dispatch:
@@ -8,17 +8,13 @@ on:
         required: true
         type: choice
         options:
-          - vsb-eink/dashboard-vue
-          - vsb-eink/compressor
-          - vsb-eink/facade
-          - vsb-eink/grouper
-          - vsb-eink/hoster
-          - vsb-eink/renderer
-          - vsb-eink/scheduler
-      image-version:
-        description: Manually set image tag, defaults to branch name and latest
-        required: false
-        type: string
+          - dashboard-vue
+          - compressor
+          - facade
+          - grouper
+          - hoster
+          - renderer
+          - scheduler
 
 env:
   REGISTRY: ghcr.io
@@ -40,17 +36,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract package version
+        id: package-version
+        run: |
+          package_name=${{inputs.image-name}}
+          if [ "$package_name" == "dashboard-vue" ]; then
+            package_type="apps"
+          else
+            package_type="services"
+          fi
+          echo "PACKAGE_VERSION=$(jq -r .version $package_type/$package_name/package.json)" >> $GITHUB_OUTPUT
+
       - name: Extract metadata for Docker image
         id: metadata
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/vsb-eink/${{ inputs.image-name }}
+          tags: |
+            type=raw,value=${{ env.PACKAGE_VERSION }}
+            type=ref,event=branch
+            type=sha
 
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          target: ${{ matrix.package-name }}
+          target: ${{ matrix.image-name }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
