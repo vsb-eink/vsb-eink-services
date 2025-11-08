@@ -2,7 +2,7 @@ ARG HOSTER_NODE_VERSION="20.17"
 ARG HOSTER_BUN_VERSION="1.1.27"
 ARG HOSTER_DENO_VERSION="2.0.0-rc.1"
 
-FROM node:21-slim AS builder-base
+FROM node:24-slim AS builder-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN apt-get update && \
@@ -11,7 +11,7 @@ RUN apt-get update && \
     corepack enable pnpm && \
     pnpm -v
 
-FROM node:21-slim AS runner-base
+FROM node:24-slim AS runner-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN apt-get update && \
