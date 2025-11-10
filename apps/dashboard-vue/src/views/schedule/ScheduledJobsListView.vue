@@ -74,6 +74,7 @@ const jobs = ref<ScheduledJob[]>([]);
 const pagination: QTableProps['pagination'] = {
 	descending: true,
 	sortBy: 'name',
+	rowsPerPage: 0
 };
 const columns: QTableColumn<ScheduledJob>[] = [
 	{

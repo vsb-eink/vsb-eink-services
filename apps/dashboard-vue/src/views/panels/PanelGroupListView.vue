@@ -106,6 +106,7 @@ const panelGroups = ref<PanelGroup[]>([]);
 const panelGroupsPagination: QTableProps['pagination'] = {
 	descending: true,
 	sortBy: 'name',
+	rowsPerPage: 0
 };
 const panelGroupsColumns: QTableColumn[] = [
 	{

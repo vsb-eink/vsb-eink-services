@@ -98,6 +98,7 @@ const userGroups = ref<UserGroup[]>([]);
 const userGroupsPagination: QTableProps['pagination'] = {
 	descending: true,
 	sortBy: 'name',
+	rowsPerPage: 0
 };
 const userGroupsColumns: QTableColumn[] = [
 	{
