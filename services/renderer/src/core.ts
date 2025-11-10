@@ -76,7 +76,11 @@ class EInkRendererCore {
 				}
 			}
 
-			context = await this.browser.newContext({ viewport: { width: 1200, height: 825 } });
+			context = await this.browser.newContext({
+				viewport: { width: 1200, height: 825 },
+				forcedColors: 'active',
+				colorScheme: 'light'
+			});
 			context.on('console', (message_) =>
 				logger.debug(`Browser console: ${message_.text()}`),
 			);
